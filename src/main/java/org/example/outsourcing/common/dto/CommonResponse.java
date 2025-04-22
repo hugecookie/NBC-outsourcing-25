@@ -1,5 +1,7 @@
 package org.example.outsourcing.common.dto;
 
+import org.example.outsourcing.common.exception.ResponseCode;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Builder;
@@ -18,6 +20,14 @@ public record CommonResponse<T> (
 			.message(message)
 			.status(status)
 			.result(result)
+			.build();
+	}
+
+	public static <T> CommonResponse<T> from(ResponseCode responseCode) {
+		return CommonResponse.<T>builder()
+			.success(responseCode.isSuccess())
+			.status(responseCode.getStatus().value())
+			.message(responseCode.getMessage())
 			.build();
 	}
 }
