@@ -55,9 +55,9 @@ public class SecurityConfig {
 				).permitAll()
 				.anyRequest().authenticated()
 			)
-			.addFilterBefore(exceptionJwtFilter, UsernamePasswordAuthenticationFilter.class)
-			.addFilterBefore(accessJwtFilter, ExceptionJwtFilter.class)
-			.addFilterBefore(refreshJwtFilter, AccessJwtFilter.class)
+			.addFilterBefore(refreshJwtFilter, UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(accessJwtFilter, RefreshJwtFilter.class)
+			.addFilterBefore(exceptionJwtFilter, AccessJwtFilter.class)
 			.build();
 	}
 
