@@ -51,8 +51,7 @@ public class SecurityConfig {
 					"/api/users/signup"
 				).permitAll()
 				.requestMatchers(HttpMethod.GET,
-					"/api/auth/oauth2/authorize/**",
-					"/api/auth/oauth2/callback/**"
+					"/api/auth/oauth2/signin/google"
 				).permitAll()
 				.anyRequest().authenticated()
 			)
@@ -66,7 +65,7 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(List.of("*"));
-		configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("*"));
 		configuration.setExposedHeaders(List.of("*"));
 		configuration.setAllowCredentials(true);
