@@ -46,11 +46,12 @@ public class JwtService {
 			.build();
 	}
 
-	// TODO : REDIS 추가후 작성 예정
-	public boolean isBlackListed(String accessToken) {
+	/*
+		// TODO : REDIS 추가후 작성 예정
+		public boolean isBlackListed(String accessToken) {
 
-	}
-
+		}
+	*/
 	public boolean isTokenExpired(String token) {
 		return jwtParser.isTokenExpired(token);
 	}

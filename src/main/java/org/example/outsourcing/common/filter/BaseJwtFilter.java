@@ -34,13 +34,13 @@ public abstract class BaseJwtFilter extends OncePerRequestFilter {
 
 		String authorization = getTokenFromRequest(request);
 		if (authorization == null || authorization.isBlank()) {
-			//throw new UserBizException(UserExceptionCode.PASSWORD_INVALID);
+			//throw new
 		}
 
 		String token = resolveToken(authorization);
 
 		if (jwtService.isTokenExpired(token)) {
-			//throw new UserBizException(UserExceptionCode.PASSWORD_INVALID);
+			//throw new
 		}
 
 		UserAuth userAuth = jwtService.getUserAuth(token);

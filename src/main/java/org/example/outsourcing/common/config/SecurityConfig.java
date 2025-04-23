@@ -38,22 +38,26 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.csrf(AbstractHttpConfigurer::disable)
-			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.requestMatchers(HttpMethod.POST,
-				"/api/auth/signin",
-				"/api/users/signup"
-			).permitAll()
-			.requestMatchers(HttpMethod.GET,
-				"/api/auth/oauth2/signin/google"
-			).permitAll()
-			.anyRequest().authenticated()
+			.sessionManagement(sm ->
+				sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+			)
+			.authorizeHttpRequests(auth -> auth
+				.requestMatchers(HttpMethod.POST,
+					"/api/auth/signin",
+					"/api/users/signup"
+				).permitAll()
+				.requestMatchers(HttpMethod.GET,
+					"/api/auth/oauth2/signin/google"
+				).permitAll()
+				.anyRequest().authenticated()
+			)
 			.addFilterBefore(refreshJwtFilter, UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(accessJwtFilter, RefreshJwtFilter.class)
-			.addFilterBefore(exceptionJwtFilter, ExceptionJwtFilter.class)
+			.addFilterBefore(exceptionJwtFilter, AccessJwtFilter.class)
 			.build();
 	}
 
@@ -61,7 +65,7 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(List.of("*"));
-		configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
+		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("*"));
 		configuration.setExposedHeaders(List.of("*"));
 		configuration.setAllowCredentials(true);
