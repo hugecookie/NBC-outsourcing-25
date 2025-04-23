@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 public class FilterConstants {
 
 	public static final List<String> WHITE_LIST = List.of("/api/auth/signin", "/api/users",
-		"/api/auth/oauth2/signin/google");
+		"/api/auth/oauth2/signin/google", "/resources", "/swagger-ui", "/v3/api-docs", "/swagger-resources",
+		"/webjars");
 	public static final String REISSUE = "/api/reissue";
 }
