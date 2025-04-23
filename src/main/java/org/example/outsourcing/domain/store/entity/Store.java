@@ -7,7 +7,8 @@ import java.time.LocalTime;
 
 import org.example.outsourcing.domain.user.entity.User;
 
-@Entity(name = "Store")
+@Entity
+@Table(name = "Store")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
