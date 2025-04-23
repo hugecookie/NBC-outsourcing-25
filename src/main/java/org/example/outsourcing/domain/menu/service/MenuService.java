@@ -1,9 +1,9 @@
 package org.example.outsourcing.domain.menu.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.outsourcing.domain.menu.dto.MenuResponse;
-import org.example.outsourcing.domain.menu.dto.MenuSaveRequest;
-import org.example.outsourcing.domain.menu.dto.MenuUpdateRequest;
+import org.example.outsourcing.domain.menu.dto.response.MenuResponse;
+import org.example.outsourcing.domain.menu.dto.request.MenuSaveRequest;
+import org.example.outsourcing.domain.menu.dto.request.MenuUpdateRequest;
 import org.example.outsourcing.domain.menu.entity.Menu;
 import org.example.outsourcing.domain.menu.exception.MenuException;
 import org.example.outsourcing.domain.menu.exception.MenuExceptionCode;
