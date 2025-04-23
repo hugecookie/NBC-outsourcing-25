@@ -1,6 +1,5 @@
 package org.example.outsourcing.domain.user.entity;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -50,7 +49,7 @@ public class User extends BaseEntity {
 	private boolean isDeleted;
 
 	@Column
-	private String profile_img_url;
+	private String profileImgUrl;
 
 	@Enumerated(EnumType.STRING)
 	private Platform platform;
@@ -58,6 +57,7 @@ public class User extends BaseEntity {
 	public void withdraw() {
 		this.name = "deleted user" + UUID.randomUUID();
 		this.isDeleted = true;
+		this.roles.clear();
 	}
 
 	public void changePassword(String newPassword) {

@@ -1,11 +1,22 @@
 package org.example.outsourcing.domain.user.entity;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.util.function.Predicate;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserRole {
-	public static final String ADMIN = "ROLE_admin";
-	public static final String OWNER = "ROLE_owner";
-	public static final String USER = "ROLE_user";
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public enum UserRole {
+
+	ADMIN("ROLE_admin", "admin"::equals),
+	USER("ROLE_user", "user"::equals),
+	OWNER("ROLE_owner", "owner"::equals);
+
+	private final String role;
+	private final Predicate<String> func;
+
+	public boolean matches(String role) {
+		return func.test(role);
+	}
 }

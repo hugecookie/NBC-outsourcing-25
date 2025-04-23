@@ -2,6 +2,8 @@ package org.example.outsourcing.common.filter;
 
 import java.io.IOException;
 
+import org.example.outsourcing.common.filter.exception.FilterException;
+import org.example.outsourcing.common.filter.exception.FilterExceptionCode;
 import org.example.outsourcing.domain.auth.dto.UserAuth;
 import org.example.outsourcing.jwt.constants.JwtConstants;
 import org.example.outsourcing.jwt.service.JwtService;
@@ -34,13 +36,13 @@ public abstract class BaseJwtFilter extends OncePerRequestFilter {
 
 		String authorization = getTokenFromRequest(request);
 		if (authorization == null || authorization.isBlank()) {
-			//throw new
+			throw new FilterException(FilterExceptionCode.EMPTY_TOKEN);
 		}
 
 		String token = resolveToken(authorization);
 
 		if (jwtService.isTokenExpired(token)) {
-			//throw new
+			throw new FilterException(FilterExceptionCode.TOKEN_EXPIRED);
 		}
 
 		UserAuth userAuth = jwtService.getUserAuth(token);
@@ -57,7 +59,7 @@ public abstract class BaseJwtFilter extends OncePerRequestFilter {
 
 	private String resolveToken(String authorization) {
 		if (!authorization.startsWith(JwtConstants.TOKEN_PREFIX)) {
-
+			throw new FilterException(FilterExceptionCode.INVALID_TOKEN_USAGE);
 		}
 		return authorization.substring(JwtConstants.TOKEN_PREFIX.length());
 	}
