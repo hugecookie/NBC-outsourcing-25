@@ -9,7 +9,7 @@ import org.example.outsourcing.domain.user.entity.User;
 
 @Getter
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Order {

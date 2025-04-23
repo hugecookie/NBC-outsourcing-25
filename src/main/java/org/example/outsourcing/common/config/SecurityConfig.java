@@ -46,9 +46,14 @@ public class SecurityConfig {
 				sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			)
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers(HttpMethod.POST,
+				.requestMatchers(
 					"/api/auth/signin",
-					"/api/users/signup"
+					"/api/users",
+					"/swagger-ui/**",
+					"/swagger-resources/**",
+					"/v2/**",
+					"/v3/**",
+					"/webjars/**"
 				).permitAll()
 				.requestMatchers(HttpMethod.GET,
 					"/api/auth/oauth2/signin/google"
