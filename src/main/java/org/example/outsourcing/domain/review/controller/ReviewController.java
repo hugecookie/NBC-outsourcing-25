@@ -1,6 +1,7 @@
 package org.example.outsourcing.domain.review.controller;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.outsourcing.common.annotation.ResponseMessage;
 import org.example.outsourcing.domain.review.dto.request.ReviewRequestDto;
@@ -22,7 +23,7 @@ public class ReviewController {
 
     @PostMapping
     @ResponseMessage("리뷰가 성공적으로 작성되었습니다.")
-    public ReviewRequestDto createReview(@RequestBody ReviewRequestDto reviewRequestDto) {
+    public ReviewRequestDto createReview(@Valid @RequestBody ReviewRequestDto reviewRequestDto) {
         User user = userRepository.findById(1L)
                 .orElseThrow(() -> new EntityNotFoundException("테스트 유저 없음"));
         reviewService.createReview(user.getId(), reviewRequestDto);
