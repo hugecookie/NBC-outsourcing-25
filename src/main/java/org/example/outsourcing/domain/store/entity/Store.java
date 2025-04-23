@@ -1,13 +1,14 @@
-package org.example.outsourcing.domain.store;
+package org.example.outsourcing.domain.store.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.outsourcing.common.base.BaseEntity;
 import java.time.LocalTime;
 
-//import org.example.outsourcing.domain.user.entity.User;
+import org.example.outsourcing.domain.user.entity.User;
 
-@Entity(name = "Store")
+@Entity
+@Table(name = "Store")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -18,9 +19,9 @@ public class Store extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User owner;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User owner;
 
     @Column(nullable = false)
     private String name;

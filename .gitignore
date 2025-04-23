@@ -44,3 +44,5 @@ bin/
 #yml
 *.yml
 *.properties
+
+.idea/

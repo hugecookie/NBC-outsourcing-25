@@ -1,10 +1,20 @@
 package org.example.outsourcing.domain.review.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+import org.example.outsourcing.common.base.BaseEntity;
+import org.example.outsourcing.domain.order.entity.Order;
+import org.example.outsourcing.domain.store.entity.Store;
+import org.example.outsourcing.domain.user.entity.User;
+
 
 
 @Entity
-public class Review {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Getter
+@Builder
+public class Review extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
