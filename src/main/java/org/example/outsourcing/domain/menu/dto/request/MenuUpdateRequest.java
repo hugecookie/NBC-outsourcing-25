@@ -1,4 +1,4 @@
-package org.example.outsourcing.domain.menu.dto;
+package org.example.outsourcing.domain.menu.dto.request;
 
 public record MenuUpdateRequest (
 

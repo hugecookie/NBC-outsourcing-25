@@ -1,4 +1,4 @@
-package org.example.outsourcing.domain.menu.dto;
+package org.example.outsourcing.domain.menu.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
