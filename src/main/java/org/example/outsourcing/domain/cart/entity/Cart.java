@@ -4,8 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.awt.*;
+import org.example.outsourcing.domain.menu.entity.Menu;
+import org.example.outsourcing.domain.store.entity.Store;
+import org.example.outsourcing.domain.user.entity.User;
 
 @Getter
 @Entity

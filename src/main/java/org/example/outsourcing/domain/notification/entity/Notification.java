@@ -1,6 +1,8 @@
 package org.example.outsourcing.domain.notification.entity;
 
 import jakarta.persistence.*;
+import org.example.outsourcing.domain.order.entity.Order;
+import org.example.outsourcing.domain.user.entity.User;
 
 import java.time.LocalDateTime;
 
