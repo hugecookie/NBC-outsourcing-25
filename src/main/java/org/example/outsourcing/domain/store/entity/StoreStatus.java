@@ -1,4 +1,4 @@
-package org.example.outsourcing.domain.store;
+package org.example.outsourcing.domain.store.entity;
 
 public enum StoreStatus {
     OPEN("영업 중"),

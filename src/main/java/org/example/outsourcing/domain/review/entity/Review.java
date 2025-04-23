@@ -1,6 +1,9 @@
 package org.example.outsourcing.domain.review.entity;
 
 import jakarta.persistence.*;
+import org.example.outsourcing.domain.order.entity.Order;
+import org.example.outsourcing.domain.store.entity.Store;
+import org.example.outsourcing.domain.user.entity.User;
 
 
 @Entity
