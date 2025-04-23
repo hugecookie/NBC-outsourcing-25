@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 
+@Builder
 @Getter
 public class UserAuth {
 	private final Long id;
@@ -23,13 +24,6 @@ public class UserAuth {
 		return roles.stream()
 			.map(SimpleGrantedAuthority::new)
 			.toList();
-	}
-
-	@Builder
-	private UserAuth(Long id, String email, List<String> roles) {
-		this.id = id;
-		this.email = email;
-		this.roles = roles;
 	}
 
 	public static UserAuth from(User user) {
