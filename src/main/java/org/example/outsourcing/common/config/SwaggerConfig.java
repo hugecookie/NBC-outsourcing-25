@@ -26,7 +26,6 @@ public class SwaggerConfig {
 		ModelConverters.getInstance().addConverter(new ModelResolver(objectMapper));
 	}
 
-
 	@Bean
 	public OpenAPI openApi() {
 		return new OpenAPI()
