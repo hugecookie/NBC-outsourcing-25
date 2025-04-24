@@ -2,6 +2,7 @@ package org.example.outsourcing.domain.cart.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.outsourcing.domain.menu.entity.Menu;
@@ -11,6 +12,7 @@ import org.example.outsourcing.domain.user.entity.User;
 @Getter
 @Entity
 @Table(name = "cart")
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Cart {
@@ -19,20 +21,26 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int quantity;
+    @Column(nullable = false)
+    private Integer quantity;
 
-    private int price;
+    @Column(nullable = false)
+    private Integer price;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;
+
+    public void updateCart(Integer quantity) {
+        this.quantity = quantity;
+    }
 
 }

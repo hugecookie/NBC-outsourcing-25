@@ -8,7 +8,7 @@ import org.example.outsourcing.domain.menu.entity.Menu;
 @Builder
 public record MenuResponse (
 
-        Long Id,
+        Long id,
 
         String name,
 
@@ -17,10 +17,11 @@ public record MenuResponse (
         String description,
 
         String menuImgUrl
+
 ){
     public static MenuResponse from(Menu menu) {
         return MenuResponse.builder()
-                .Id(menu.getId())
+                .id(menu.getId())
                 .name(menu.getName())
                 .price(menu.getPrice())
                 .description(menu.getDescription())

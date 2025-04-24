@@ -20,27 +20,27 @@ public class MenuController {
 
     private final MenuService menuService;
 
-    @PostMapping("/owner/stores/{storeId}/menus")
+    @PostMapping("/stores/{storeId}/menus")
     @ResponseMessage("정상적으로 메뉴 등록처리 되었습니다.")
     public ResponseEntity<MenuResponse> createMenu(@PathVariable Long storeId,
                                                    @RequestBody @Valid MenuSaveRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(menuService.createMenu(storeId, request));
     }
 
-    @GetMapping("/menus/stores/{storeId}")
+    @GetMapping("/stores/{storeId}/menus")
     @ResponseMessage("정상적으로 메뉴 조회처리 되었습니다.")
-    public ResponseEntity<List<MenuResponse>> getMenusByStoreId(@PathVariable Long storeId) {
+    public ResponseEntity<List<MenuResponse>> getMenus(@PathVariable Long storeId) {
         return ResponseEntity.status(HttpStatus.OK).body(menuService.getMenusByStoreId(storeId));
     }
 
-    @PutMapping("/owner/menus/{menuId}")
+    @PutMapping("/menus/{menuId}")
     @ResponseMessage("정상적으로 메뉴 수정처리 되었습니다.")
     public ResponseEntity<MenuResponse> updateMenu(@PathVariable Long menuId,
                                                    @RequestBody MenuUpdateRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(menuService.updateMenu(menuId, request));
     }
 
-    @DeleteMapping("/owner/menus/{menuId}")
+    @DeleteMapping("/menus/{menuId}")
     public ResponseEntity<Void> deleteMenu(@PathVariable Long menuId) {
         menuService.deleteMenu(menuId);
         return ResponseEntity.noContent().build();
