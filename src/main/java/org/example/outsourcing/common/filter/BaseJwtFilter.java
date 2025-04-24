@@ -47,7 +47,6 @@ public abstract class BaseJwtFilter extends OncePerRequestFilter {
 		if (jwtService.isBlackListed(token) && shouldCheckBlackList()) {
 			throw new FilterException(FilterExceptionCode.CANT_USE_TOKEN);
 		}
-		// 로그아웃한 토큰은 이제 재사용이 안되게끔 처리했습니다
 
 		if (jwtService.isTokenExpired(token)) {
 			throw new FilterException(FilterExceptionCode.TOKEN_EXPIRED);

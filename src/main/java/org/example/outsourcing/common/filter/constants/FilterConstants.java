@@ -16,7 +16,8 @@ public class FilterConstants {
 		"/swagger-ui",
 		"/v3/api-docs",
 		"/swagger-resources",
-		"/webjars"
+		"/webjars",
+		"/api/auth/social/login"
 	);
 
 	public static final String REISSUE = "/api/auth/reissue";

@@ -5,15 +5,18 @@ import java.util.List;
 import org.example.outsourcing.common.filter.AccessJwtFilter;
 import org.example.outsourcing.common.filter.ExceptionJwtFilter;
 import org.example.outsourcing.common.filter.RefreshJwtFilter;
+import org.example.outsourcing.common.filter.handler.OauthSuccessHandler;
 import org.example.outsourcing.jwt.service.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -29,11 +32,13 @@ public class SecurityConfig {
 	private final RefreshJwtFilter refreshJwtFilter;
 	private final AccessJwtFilter accessJwtFilter;
 	private final ExceptionJwtFilter exceptionJwtFilter;
+	private final OauthSuccessHandler successHandler;
 
-	public SecurityConfig(JwtService jwtService) {
+	public SecurityConfig(JwtService jwtService, OauthSuccessHandler successHandler) {
 		this.refreshJwtFilter = new RefreshJwtFilter(jwtService);
 		this.accessJwtFilter = new AccessJwtFilter(jwtService);
 		this.exceptionJwtFilter = new ExceptionJwtFilter();
+		this.successHandler = successHandler;
 	}
 
 	@Bean
@@ -42,6 +47,36 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	@Order(1)
+	public SecurityFilterChain oauth2Chain(HttpSecurity http) throws Exception {
+		http
+			.securityMatcher("/api/auth/oauth2/**")
+			.authorizeHttpRequests(a -> a
+				.anyRequest().authenticated()
+			)
+			.oauth2Login(oauth2 -> oauth2
+				.authorizationEndpoint(ep ->
+					ep.baseUri("/api/auth/oauth2/signin")
+				)
+				.redirectionEndpoint(re ->
+					re.baseUri("/api/auth/oauth2/callback/*")
+				)
+				.userInfoEndpoint(ui -> ui
+					.userAuthoritiesMapper(grantedAuthoritiesMapper()))
+				.successHandler(successHandler)
+			);
+		return http.build();
+	}
+
+	@Bean
+	public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
+		return authorities -> List.of(
+			(new SimpleGrantedAuthority("ROLE_social"))
+		);
+	}
+
+	@Bean
+	@Order(2)
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -57,10 +92,8 @@ public class SecurityConfig {
 					"/swagger-resources/**",
 					"/v2/**",
 					"/v3/**",
-					"/webjars/**"
-				).permitAll()
-				.requestMatchers(HttpMethod.GET,
-					"/api/auth/oauth2/signin/google"
+					"/webjars/**",
+					"/api/auth/social/login"
 				).permitAll()
 				.anyRequest().authenticated()
 			)

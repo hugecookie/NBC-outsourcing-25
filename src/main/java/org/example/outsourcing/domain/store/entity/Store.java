@@ -5,6 +5,7 @@ import lombok.*;
 import org.example.outsourcing.common.base.BaseEntity;
 import java.time.LocalTime;
 
+import org.example.outsourcing.domain.store.dto.StoreRequest;
 import org.example.outsourcing.domain.user.entity.User;
 
 @Entity
@@ -49,6 +50,19 @@ public class Store extends BaseEntity {
 
     @Column(nullable = false)
     private String storeImgUrl;
+
+    public void updateFrom(StoreRequest dto) {
+        if (dto.name() != null) this.name = dto.name();
+        if (dto.category() != null) this.category = dto.category();
+        if (dto.description() != null) this.description = dto.description();
+        if (dto.address() != null) this.address = dto.address();
+        if (dto.phone() != null) this.phone = dto.phone();
+        if (dto.minPrice() != null) this.minPrice = dto.minPrice();
+        if (dto.shopOpen() != null) this.shopOpen = LocalTime.parse(dto.shopOpen());
+        if (dto.shopClose() != null) this.shopClose = LocalTime.parse(dto.shopClose());
+        if (dto.storeImgUrl() != null) this.storeImgUrl = dto.storeImgUrl();
+        if (dto.status() != null) this.status = StoreStatus.valueOf(dto.status()); // 폐업 처리 포함
+    }
 
     public void updateStoreImgUrl(String url) {
         this.storeImgUrl = url;
