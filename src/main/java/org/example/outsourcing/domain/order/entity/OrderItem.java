@@ -2,6 +2,7 @@ package org.example.outsourcing.domain.order.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.outsourcing.domain.menu.entity.Menu;
@@ -11,6 +12,7 @@ import org.example.outsourcing.domain.menu.entity.Menu;
 @Table(name = "orderItem")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class OrderItem {
 
     @Id
@@ -25,8 +27,10 @@ public class OrderItem {
     @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;
 
-    private int quantity;
+    @Column(nullable = false)
+    private Integer quantity;
 
-    private int price;
+    @Column(nullable = false)
+    private Integer price;
 
 }
