@@ -5,6 +5,7 @@ import lombok.*;
 import org.example.outsourcing.common.base.BaseEntity;
 import java.time.LocalTime;
 
+import org.example.outsourcing.domain.store.dto.StoreRequest;
 import org.example.outsourcing.domain.user.entity.User;
 
 @Entity
