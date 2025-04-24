@@ -55,7 +55,7 @@ public class UserService {
 	@Transactional
 	public void withDrawUser(UserDeleteRequest request, String accessToken) {
 
-		User user = userRepository.findByEmailAndIsDeleted(request.email(), false)
+		User user = userRepository.findByEmailAndPlatformAndIsDeleted(request.email(), Platform.LOCAL, false)
 			.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND));
 
 		checkPassword(request.password(), user.getPassword());
@@ -69,7 +69,7 @@ public class UserService {
 
 	private void checkEmail(String email) {
 
-		if (userRepository.existsByEmail(email)) {
+		if (userRepository.existsByEmailAndPlatform(email, Platform.LOCAL)) {
 			throw new UserException(UserExceptionCode.ALREADY_EXISTS_EMAIL);
 		}
 	}

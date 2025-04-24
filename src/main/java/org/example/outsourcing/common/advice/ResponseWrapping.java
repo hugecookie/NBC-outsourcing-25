@@ -26,10 +26,6 @@ public class ResponseWrapping implements ResponseBodyAdvice<Object> {
 		return declaringClass.isAnnotationPresent(RestController.class);
 	}
 
-	/* or 조건으로 @ResponseBody 까지 검사하면 exceptionHandler 도 여기서 랩핑 되서
-	   일단 현재 계획은 ExceptionHandler 는 따로 또 ResponseBodyAdvice 를 만들던지
-	   혹은 exceptionHandler 내부에서 랩핑하던지 하게끔 처리할 예정입니다      */
-
 	@Override
 	public Object beforeBodyWrite(
 		Object body,
