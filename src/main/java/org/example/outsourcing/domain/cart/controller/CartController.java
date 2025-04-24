@@ -22,7 +22,7 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping("/stores/{storeId}/menus/{menuId}/carts")
-    @ResponseMessage("정상적으로 장바구니에 추가처리 되었습니다.")
+    @ResponseMessage("정상적으로 장바구니에 추가 처리 되었습니다.")
     public ResponseEntity<CartItemResponse> createCart(@PathVariable Long storeId,
                                                    @PathVariable Long menuId,
                                                    @RequestBody @Valid CartSaveRequest request) {
@@ -32,7 +32,7 @@ public class CartController {
     }
 
     @GetMapping("/carts")
-    @ResponseMessage("정상적으로 장바구니 조회처리 되었습니다.")
+    @ResponseMessage("정상적으로 장바구니 조회 처리 되었습니다.")
     public ResponseEntity<CartResponse<CartItemResponse>> getCarts() {
         // 인증 유저 아이디 받아야함
         Long userId = 1L;
@@ -40,7 +40,7 @@ public class CartController {
     }
 
     @PutMapping("/carts/{cartId}")
-    @ResponseMessage("정상적으로 장바구니 변경처리 되었습니다.")
+    @ResponseMessage("정상적으로 장바구니 변경 처리 되었습니다.")
     public ResponseEntity<CartItemResponse> updateCart(@PathVariable Long cartId,
                                                    @RequestBody CartUpdateRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(cartService.updateCart(cartId, request));

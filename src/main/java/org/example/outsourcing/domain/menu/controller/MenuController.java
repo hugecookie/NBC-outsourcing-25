@@ -21,20 +21,20 @@ public class MenuController {
     private final MenuService menuService;
 
     @PostMapping("/stores/{storeId}/menus")
-    @ResponseMessage("정상적으로 메뉴 등록처리 되었습니다.")
+    @ResponseMessage("정상적으로 메뉴 등록 처리 되었습니다.")
     public ResponseEntity<MenuResponse> createMenu(@PathVariable Long storeId,
                                                    @RequestBody @Valid MenuSaveRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(menuService.createMenu(storeId, request));
     }
 
     @GetMapping("/stores/{storeId}/menus")
-    @ResponseMessage("정상적으로 메뉴 조회처리 되었습니다.")
+    @ResponseMessage("정상적으로 메뉴 조회 처리 되었습니다.")
     public ResponseEntity<List<MenuResponse>> getMenus(@PathVariable Long storeId) {
         return ResponseEntity.status(HttpStatus.OK).body(menuService.getMenusByStoreId(storeId));
     }
 
     @PutMapping("/menus/{menuId}")
-    @ResponseMessage("정상적으로 메뉴 수정처리 되었습니다.")
+    @ResponseMessage("정상적으로 메뉴 수정 처리 되었습니다.")
     public ResponseEntity<MenuResponse> updateMenu(@PathVariable Long menuId,
                                                    @RequestBody MenuUpdateRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(menuService.updateMenu(menuId, request));
