@@ -2,9 +2,9 @@ package org.example.outsourcing.domain.store.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.outsourcing.common.s3.S3Service;
-import org.example.outsourcing.domain.store.dto.StoreDetailResponseDto;
-import org.example.outsourcing.domain.store.dto.StoreRequestDto;
-import org.example.outsourcing.domain.store.dto.StoreResponseDto;
+import org.example.outsourcing.domain.store.dto.StoreDetailResponse;
+import org.example.outsourcing.domain.store.dto.StoreRequest;
+import org.example.outsourcing.domain.store.dto.StoreResponse;
 import org.example.outsourcing.domain.store.entity.Store;
 import org.example.outsourcing.domain.store.exception.StoreException;
 import org.example.outsourcing.domain.store.exception.StoreExceptionCode;
@@ -28,12 +28,12 @@ public class StoreService {
     /**
      * 가게 생성
      *
-     * @param requestDto 생성할 가게 요청 정보
+     * @param request 생성할 가게 요청 정보
      * @param user 가게를 등록하는 사용자
      * @return 생성된 가게 정보
      * @throws StoreException 권한 없음 또는 최대 등록 수 초과 시 발생
      */
-    public StoreResponseDto createStore(StoreRequestDto requestDto, User user) {
+    public StoreResponse createStore(StoreRequest request, User user) {
         System.out.println("🔎 현재 유저 권한 목록:");
         user.getRoles().forEach(role -> System.out.println(" - " + role));
 
@@ -45,9 +45,9 @@ public class StoreService {
             throw new StoreException(StoreExceptionCode.STORE_LIMIT_EXCEEDED);
         }
 
-        Store store = requestDto.toEntity(user);
+        Store store = request.toEntity(user);
         storeRepository.save(store);
-        return StoreResponseDto.from(store);
+        return StoreResponse.from(store);
     }
 
     /**
@@ -56,10 +56,10 @@ public class StoreService {
      * @param keyword 가게 이름 일부
      * @return 검색된 가게 목록
      */
-    public List<StoreResponseDto> searchStores(String keyword) {
+    public List<StoreResponse> searchStores(String keyword) {
         return storeRepository.findByNameContaining(keyword)
                 .stream()
-                .map(StoreResponseDto::from)
+                .map(StoreResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -70,10 +70,10 @@ public class StoreService {
      * @return 가게 상세 정보
      * @throws StoreException 가게가 존재하지 않을 경우 발생
      */
-    public StoreDetailResponseDto getStoreDetail(Long id) {
+    public StoreDetailResponse getStoreDetail(Long id) {
         Store store = storeRepository.findById(id)
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
-        return StoreDetailResponseDto.from(store);
+        return StoreDetailResponse.from(store);
     }
 
     /**
@@ -86,7 +86,7 @@ public class StoreService {
      * @throws StoreException 권한 없거나 가게가 없을 경우
      */
     @Transactional
-    public StoreResponseDto updateStoreImage(Long storeId, MultipartFile image, User user) {
+    public StoreResponse updateStoreImage(Long storeId, MultipartFile image, User user) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
 
@@ -100,7 +100,7 @@ public class StoreService {
         store.updateStoreImgUrl(url);
         storeRepository.save(store);
 
-        return StoreResponseDto.from(store);
+        return StoreResponse.from(store);
     }
 }
 
