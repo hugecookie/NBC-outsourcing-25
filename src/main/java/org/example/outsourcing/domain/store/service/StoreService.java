@@ -102,6 +102,28 @@ public class StoreService {
 
         return StoreResponse.from(store);
     }
+
+    /**
+     * 가게 정보 수정
+     *
+     * @param storeId 수정할 가게 ID
+     * @param request 수정할 가게 데이터 (입력한 값만)
+     * @param user 현재 로그인한 사용자
+     * @return 수정된 가게 정보
+     * @throws StoreException 권한 없거나 가게가 없을 경우
+     */
+    @Transactional
+    public StoreResponse updateStore(Long storeId, StoreRequest request, User user) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
+
+        if (!store.getOwner().getId().equals(user.getId())) {
+            throw new StoreException(StoreExceptionCode.NO_AUTH_FOR_STORE_MODIFICATION);
+        }
+
+        store.updateFrom(request);
+        return StoreResponse.from(store);
+    }
 }
 
 

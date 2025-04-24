@@ -84,12 +84,26 @@ public class StoreController {
             @PathVariable Long storeId,
             @RequestParam MultipartFile image,
             Authentication authentication) {
+        User user = getUser(authentication);
+        return ResponseEntity.ok(storeService.updateStoreImage(storeId, image, user));
+    }
 
-        UserAuth userAuth = (UserAuth) authentication.getPrincipal();
-        User user = userRepository.findById(userAuth.getId())
-                .orElseThrow(() -> new StoreException(StoreExceptionCode.USER_NOT_FOUND));
+    @Operation(summary = "가게 수정", security = {@SecurityRequirement(name = "bearer-key")})
+    @PutMapping("/{id}")
+    @ResponseMessage("가게 정보가 수정되었습니다.")
+    public ResponseEntity<StoreResponse> updateStore(
+            @PathVariable Long id,
+            @Valid @RequestBody StoreRequest request,
+            Authentication authentication) {
 
-        StoreResponse response = storeService.updateStoreImage(storeId, image, user);
+        User user = getUser(authentication);
+        StoreResponse response = storeService.updateStore(id, request, user);
         return ResponseEntity.ok(response);
+    }
+
+    private User getUser(Authentication authentication) {
+        UserAuth userAuth = (UserAuth) authentication.getPrincipal();
+        return userRepository.findById(userAuth.getId())
+                .orElseThrow(() -> new StoreException(StoreExceptionCode.USER_NOT_FOUND));
     }
 }
