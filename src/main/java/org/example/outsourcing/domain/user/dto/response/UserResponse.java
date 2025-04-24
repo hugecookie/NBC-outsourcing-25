@@ -5,9 +5,7 @@ import java.time.LocalDateTime;
 import org.example.outsourcing.domain.user.entity.User;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 
-@Builder
 public record UserResponse(
 
 	@Schema(description = "계정 생성자의 email")
@@ -17,9 +15,6 @@ public record UserResponse(
 
 ) {
 	public static UserResponse from(User user) {
-		return UserResponse.builder()
-			.email(user.getEmail())
-			.createdAt(user.getCreatedAt())
-			.build();
+		return new UserResponse(user.getEmail(), user.getCreatedAt());
 	}
 }
