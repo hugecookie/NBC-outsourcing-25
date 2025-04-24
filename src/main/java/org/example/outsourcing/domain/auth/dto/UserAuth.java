@@ -19,7 +19,6 @@ public class UserAuth {
 	private final String email;
 	private final List<String> roles;
 
-	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return roles.stream()
 			.map(SimpleGrantedAuthority::new)

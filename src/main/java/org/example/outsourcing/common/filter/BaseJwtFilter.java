@@ -26,8 +26,11 @@ public abstract class BaseJwtFilter extends OncePerRequestFilter {
 	private final JwtService jwtService;
 
 	@Override
-	protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-		@NonNull FilterChain filterChain) throws ServletException, IOException {
+	protected void doFilterInternal(
+		@NonNull HttpServletRequest request,
+		@NonNull HttpServletResponse response,
+		@NonNull FilterChain filterChain
+	) throws ServletException, IOException {
 
 		if (shouldSkip(request)) {
 			filterChain.doFilter(request, response);
@@ -41,14 +44,21 @@ public abstract class BaseJwtFilter extends OncePerRequestFilter {
 
 		String token = resolveToken(authorization);
 
+		if (jwtService.isBlackListed(token) && shouldCheckBlackList()) {
+			throw new FilterException(FilterExceptionCode.CANT_USE_TOKEN);
+		}
+		// 로그아웃한 토큰은 이제 재사용이 안되게끔 처리했습니다
+
 		if (jwtService.isTokenExpired(token)) {
 			throw new FilterException(FilterExceptionCode.TOKEN_EXPIRED);
 		}
 
 		UserAuth userAuth = jwtService.getUserAuth(token);
-
-		Authentication authentication = new UsernamePasswordAuthenticationToken(userAuth, token,
-			userAuth.getAuthorities());
+		Authentication authentication = new UsernamePasswordAuthenticationToken(
+			userAuth,
+			token,
+			userAuth.getAuthorities()
+		);
 
 		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 		securityContext.setAuthentication(authentication);

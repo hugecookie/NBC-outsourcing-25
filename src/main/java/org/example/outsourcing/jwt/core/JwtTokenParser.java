@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import org.example.outsourcing.common.filter.exception.FilterExceptionCode;
 import org.example.outsourcing.domain.auth.dto.UserAuth;
 import org.example.outsourcing.jwt.constants.JwtConstants;
 import org.example.outsourcing.jwt.exception.TokenException;
@@ -32,7 +33,7 @@ public class JwtTokenParser {
 		} catch (ExpiredJwtException expiredJwtException) {
 			return expiredJwtException.getClaims();
 		} catch (MalformedJwtException malformedJwtException) {
-			throw new TokenException(TokenExceptionCode.NOT_VALID_JWT_TOKEN);
+			throw new TokenException(FilterExceptionCode.MALFORMED_JWT_REQUEST);
 		} catch (SignatureException signatureException) {
 			throw new TokenException(TokenExceptionCode.NOT_VALID_SIGNATURE);
 		} catch (UnsupportedJwtException unsupportedJwtException) {

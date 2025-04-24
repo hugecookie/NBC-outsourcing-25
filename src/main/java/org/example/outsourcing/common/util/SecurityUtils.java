@@ -1,4 +1,4 @@
-package org.example.outsourcing.domain.auth.util;
+package org.example.outsourcing.common.util;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -11,5 +11,6 @@ public class SecurityUtils {
 	}
 }
 
-//컨텍스트 홀더에서 토큰을 가져오는 헬퍼 클래스입니다
+//auth user 도메인 등 여러곳에서 참조되어 common 하위로 이동시켰습니다
+
 

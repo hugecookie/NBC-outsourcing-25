@@ -46,8 +46,6 @@ public class ResponseWrapping implements ResponseBodyAdvice<Object> {
 			return body;
 		}
 
-		//swagger 내용물도 랩핑해버리므로 해당 경로는 예외처리
-
 		if (body instanceof CommonResponse<?>) {
 			return body;
 		}
@@ -56,6 +54,7 @@ public class ResponseWrapping implements ResponseBodyAdvice<Object> {
 		String message = (rm != null)
 			? rm.value()
 			: "정상적으로 수행되었습니다.";
+
 		HttpStatusCode status = response instanceof ServletServerHttpResponse servlet
 			? HttpStatusCode.valueOf(servlet.getServletResponse().getStatus())
 			: HttpStatusCode.valueOf(HttpStatus.OK.value());

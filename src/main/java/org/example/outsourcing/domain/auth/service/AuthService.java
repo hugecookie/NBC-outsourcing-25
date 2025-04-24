@@ -2,9 +2,9 @@ package org.example.outsourcing.domain.auth.service;
 
 import java.util.Date;
 
-import org.example.outsourcing.domain.auth.dto.TokenResponse;
+import org.example.outsourcing.domain.auth.dto.response.TokenResponse;
 import org.example.outsourcing.domain.auth.dto.UserAuth;
-import org.example.outsourcing.domain.auth.dto.loginRequest;
+import org.example.outsourcing.domain.auth.dto.request.loginRequest;
 import org.example.outsourcing.domain.user.entity.User;
 import org.example.outsourcing.domain.user.exception.UserException;
 import org.example.outsourcing.domain.user.exception.UserExceptionCode;
@@ -35,10 +35,14 @@ public class AuthService {
 		return jwtService.generateToken(UserAuth.from(user), new Date());
 	}
 
-	// TODO : REDIS 기능 연동 후 구현예정
 	public void sighOut(String accessToken) {
 
+		jwtService.addBlackListToken(accessToken);
+	}
 
+	public TokenResponse reissue(UserAuth userAuth, String refreshToken) {
+
+		return jwtService.reissueToken(userAuth, refreshToken);
 	}
 
 	private void checkPassword(String rawPassword, String hashedPassword) {
