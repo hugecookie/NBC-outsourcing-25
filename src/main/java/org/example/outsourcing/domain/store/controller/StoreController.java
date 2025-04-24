@@ -79,8 +79,8 @@ public class StoreController {
      * @param authentication 로그인 정보
      * @return 변경된 가게 정보
      */
-    @PostMapping(value = "/api/stores/{storeId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<StoreResponseDto> updateImage(
+    @PutMapping(value = "/api/stores/{storeId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<StoreResponseDto> updateStoreImage(
             @PathVariable Long storeId,
             @RequestParam MultipartFile image,
             Authentication authentication) {
@@ -89,7 +89,7 @@ public class StoreController {
         User user = userRepository.findById(userAuth.getId())
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.USER_NOT_FOUND));
 
-        StoreResponseDto response = storeService.updateImage(storeId, image, user);
+        StoreResponseDto response = storeService.updateStoreImage(storeId, image, user);
         return ResponseEntity.ok(response);
     }
 }

@@ -86,7 +86,7 @@ public class StoreService {
      * @throws StoreException 권한 없거나 가게가 없을 경우
      */
     @Transactional
-    public StoreResponseDto updateImage(Long storeId, MultipartFile image, User user) {
+    public StoreResponseDto updateStoreImage(Long storeId, MultipartFile image, User user) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
 
