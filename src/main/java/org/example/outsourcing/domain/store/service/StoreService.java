@@ -5,6 +5,7 @@ import org.example.outsourcing.common.s3.S3Service;
 import org.example.outsourcing.domain.store.dto.StoreDetailResponse;
 import org.example.outsourcing.domain.store.dto.StoreRequest;
 import org.example.outsourcing.domain.store.dto.StoreResponse;
+import org.example.outsourcing.domain.store.entity.StoreStatus;
 import org.example.outsourcing.domain.store.entity.Store;
 import org.example.outsourcing.domain.store.exception.StoreException;
 import org.example.outsourcing.domain.store.exception.StoreExceptionCode;
@@ -57,8 +58,8 @@ public class StoreService {
      * @return 검색된 가게 목록
      */
     public List<StoreResponse> searchStores(String keyword) {
-        return storeRepository.findByNameContaining(keyword)
-                .stream()
+        return storeRepository.findByNameContaining(keyword).stream()
+                .filter(store -> store.getStatus() != StoreStatus.TERMINATED)
                 .map(StoreResponse::from)
                 .collect(Collectors.toList());
     }
