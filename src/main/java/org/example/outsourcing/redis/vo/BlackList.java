@@ -5,7 +5,10 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
+import lombok.Builder;
+
 @RedisHash("BlackList")
+@Builder
 public record BlackList(
 
 	@Id
@@ -17,7 +20,10 @@ public record BlackList(
 ) {
 
 	public static BlackList from(RedisToken dto) {
-		return new BlackList(dto.accessToken(), dto.timeToLive());
+		return BlackList.builder()
+			.accessToken(dto.accessToken())
+			.expiration(dto.timeToLive())
+			.build();
 	}
 
 }
