@@ -45,5 +45,4 @@ public class UserController {
 		return ResponseEntity.ok().build();
 	}
 
-	//컨트롤러에
 }
