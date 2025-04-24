@@ -1,14 +1,20 @@
 package org.example.outsourcing.domain.store.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.outsourcing.domain.auth.dto.UserAuth;
 import org.example.outsourcing.domain.store.dto.StoreDetailResponseDto;
 import org.example.outsourcing.domain.store.dto.StoreRequestDto;
 import org.example.outsourcing.domain.store.dto.StoreResponseDto;
+import org.example.outsourcing.domain.store.exception.StoreException;
+import org.example.outsourcing.domain.store.exception.StoreExceptionCode;
 import org.example.outsourcing.domain.store.service.StoreService;
 import org.example.outsourcing.domain.user.entity.User;
 import org.example.outsourcing.domain.user.repository.UserRepository;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,14 +30,18 @@ public class StoreController {
      * 가게 등록
      *
      * @param requestDto 등록할 가게 정보
+     * @param authentication 인증된 사용자 정보
      * @return 등록된 가게 정보
      */
     @PostMapping
     public ResponseEntity<StoreResponseDto> createStore(
-            @RequestBody StoreRequestDto requestDto
+            @RequestBody StoreRequestDto requestDto,
+            Authentication authentication
     ) {
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("테스트용 유저가 존재하지 않습니다."));
+        UserAuth userAuth = (UserAuth) authentication.getPrincipal();
+
+        User user = userRepository.findById(userAuth.getId())
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
         StoreResponseDto response = storeService.createStore(requestDto, user);
         return ResponseEntity.ok(response);
@@ -59,5 +69,27 @@ public class StoreController {
     public ResponseEntity<List<StoreResponseDto>> searchStores(@RequestParam String keyword) {
         List<StoreResponseDto> stores = storeService.searchStores(keyword);
         return ResponseEntity.ok(stores);
+    }
+
+    /**
+     * 가게 이미지 변경 API
+     *
+     * @param storeId 가게 ID
+     * @param image 새 이미지 파일
+     * @param authentication 로그인 정보
+     * @return 변경된 가게 정보
+     */
+    @PutMapping(value = "/api/stores/{storeId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<StoreResponseDto> updateStoreImage(
+            @PathVariable Long storeId,
+            @RequestParam MultipartFile image,
+            Authentication authentication) {
+
+        UserAuth userAuth = (UserAuth) authentication.getPrincipal();
+        User user = userRepository.findById(userAuth.getId())
+                .orElseThrow(() -> new StoreException(StoreExceptionCode.USER_NOT_FOUND));
+
+        StoreResponseDto response = storeService.updateStoreImage(storeId, image, user);
+        return ResponseEntity.ok(response);
     }
 }

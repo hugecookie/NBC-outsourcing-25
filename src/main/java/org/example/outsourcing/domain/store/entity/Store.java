@@ -49,4 +49,8 @@ public class Store extends BaseEntity {
 
     @Column(nullable = false)
     private String storeImgUrl;
+
+    public void updateStoreImgUrl(String url) {
+        this.storeImgUrl = url;
+    }
 }
