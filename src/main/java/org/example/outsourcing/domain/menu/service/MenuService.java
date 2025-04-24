@@ -1,5 +1,6 @@
 package org.example.outsourcing.domain.menu.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.outsourcing.domain.menu.dto.response.MenuResponse;
 import org.example.outsourcing.domain.menu.dto.request.MenuSaveRequest;
@@ -8,6 +9,10 @@ import org.example.outsourcing.domain.menu.entity.Menu;
 import org.example.outsourcing.domain.menu.exception.MenuException;
 import org.example.outsourcing.domain.menu.exception.MenuExceptionCode;
 import org.example.outsourcing.domain.menu.repository.MenuRepository;
+import org.example.outsourcing.domain.store.entity.Store;
+import org.example.outsourcing.domain.store.exception.StoreException;
+import org.example.outsourcing.domain.store.exception.StoreExceptionCode;
+import org.example.outsourcing.domain.store.repository.StoreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,14 +22,16 @@ import java.util.List;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    // private final StoreRepository storeRepository;
+    private final StoreRepository storeRepository;
 
     public MenuResponse createMenu(Long storeId, MenuSaveRequest request) {
 
-        // Store store = storeRepository.findById(storeId)
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
+
         Menu menu = menuRepository.save(
                 Menu.builder()
-                        //.store(store))
+                        .store(store)
                         .name(request.name())
                         .price(request.price())
                         .description(request.description())
@@ -36,29 +43,32 @@ public class MenuService {
     }
 
     public List<MenuResponse> getMenusByStoreId(Long storeId) {
-        // Store store = storeRepository.findById(storeId)
 
-//        return menuRepository.findAllByStoreAndIsDeletedFalse(store)
-//                .stream()
-//                .map(MenuResponse::from)
-//                .toList();
-        return null;
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
+
+        return menuRepository.findAllByStoreAndIsDeletedFalse(store)
+                .stream()
+                .map(MenuResponse::from)
+                .toList();
     }
 
+    @Transactional
     public MenuResponse updateMenu(Long menuId, MenuUpdateRequest request) {
 
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new MenuException(MenuExceptionCode.NOT_FOUND_MENU));
+                .orElseThrow(() -> new MenuException(MenuExceptionCode.MENU_NOT_FOUND));
 
         menu.updateMenu(request.name(), request.price(), request.description(), request.menuImgUrl());
 
         return MenuResponse.from(menu);
     }
 
+    @Transactional
     public void deleteMenu(Long menuId) {
 
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new MenuException(MenuExceptionCode.NOT_FOUND_MENU));
+                .orElseThrow(() -> new MenuException(MenuExceptionCode.MENU_NOT_FOUND));
 
         menu.deleteMenu(true);
     }
