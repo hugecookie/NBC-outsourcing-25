@@ -1,6 +1,5 @@
 package org.example.outsourcing.domain.cart.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.outsourcing.domain.cart.dto.request.CartSaveRequest;
 import org.example.outsourcing.domain.cart.dto.request.CartUpdateRequest;
@@ -23,6 +22,7 @@ import org.example.outsourcing.domain.user.exception.UserException;
 import org.example.outsourcing.domain.user.exception.UserExceptionCode;
 import org.example.outsourcing.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -36,6 +36,7 @@ public class CartService {
     private final MenuRepository menuRepository;
     private final CartRepository cartRepository;
 
+    @Transactional
     public CartItemResponse createCart(Long userId, Long storeId, Long menuId, CartSaveRequest request) {
 
         User user = userRepository.findById(userId)
@@ -68,6 +69,7 @@ public class CartService {
         return CartItemResponse.from(cart);
     }
 
+    @Transactional(readOnly = true)
     public CartResponse<CartItemResponse> getCartsByUserId(Long userId) {
 
         User user = userRepository.findById(userId)
@@ -116,7 +118,7 @@ public class CartService {
             throw new CartException(CartExceptionCode.ONLY_CART_OWNER_CAN_MODIFY);
         }
 
-        cartRepository.deleteAllByUser(user);
+        cartRepository.deleteAllInBatch(carts);
     }
 
     @Transactional
@@ -140,7 +142,7 @@ public class CartService {
         Store existingStore = carts.get(0).getStore();
 
         if (!existingStore.getId().equals(newStore.getId())) {
-            cartRepository.deleteAllByUser(user);
+            cartRepository.deleteAllInBatch(carts);
         }
 
     }

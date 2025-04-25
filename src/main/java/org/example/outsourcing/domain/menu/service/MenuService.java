@@ -1,6 +1,5 @@
 package org.example.outsourcing.domain.menu.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.outsourcing.domain.menu.dto.response.MenuResponse;
 import org.example.outsourcing.domain.menu.dto.request.MenuSaveRequest;
@@ -14,6 +13,7 @@ import org.example.outsourcing.domain.store.exception.StoreException;
 import org.example.outsourcing.domain.store.exception.StoreExceptionCode;
 import org.example.outsourcing.domain.store.repository.StoreRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,12 +24,13 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
 
+    @Transactional
     public MenuResponse createMenu(Long userId, Long storeId, MenuSaveRequest request) {
 
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
 
-        if (!store.getId().equals(userId)) {
+        if (!store.getOwner().getId().equals(userId)) {
             throw new MenuException(MenuExceptionCode.ONLY_STORE_OWNER_CAN_MODIFY);
         }
 
@@ -40,12 +41,14 @@ public class MenuService {
                         .price(request.price())
                         .description(request.description())
                         .menuImgUrl(request.menuImgUrl())
+                        .isDeleted(false)
                         .build()
         );
 
         return MenuResponse.from(menu);
     }
 
+    @Transactional(readOnly = true)
     public List<MenuResponse> getMenusByStoreId(Long storeId) {
 
         Store store = storeRepository.findById(storeId)

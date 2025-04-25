@@ -31,7 +31,6 @@ public class Menu extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @ColumnDefault("false")
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
