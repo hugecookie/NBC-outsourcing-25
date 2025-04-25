@@ -1,10 +1,8 @@
 package org.example.outsourcing.domain.order.dto.reponse;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
 import lombok.Getter;
 import org.example.outsourcing.domain.order.entity.Order;
-import org.example.outsourcing.domain.order.entity.OrderStatus;
 
 import java.util.List;
 
