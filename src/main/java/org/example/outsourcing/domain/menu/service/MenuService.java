@@ -30,10 +30,14 @@ public class MenuService {
     private final StoreRepository storeRepository;
     private final S3Service s3Service;
 
-    public MenuResponse createMenu(Long storeId, MenuSaveRequest request) {
+    public MenuResponse createMenu(Long userId, Long storeId, MenuSaveRequest request) {
 
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
+
+        if (!store.getId().equals(userId)) {
+            throw new MenuException(MenuExceptionCode.ONLY_STORE_OWNER_CAN_MODIFY);
+        }
 
         Menu menu = menuRepository.save(
                 Menu.builder()
@@ -60,10 +64,14 @@ public class MenuService {
     }
 
     @Transactional
-    public MenuResponse updateMenu(Long menuId, MenuUpdateRequest request) {
+    public MenuResponse updateMenu(Long userId, Long menuId, MenuUpdateRequest request) {
 
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new MenuException(MenuExceptionCode.MENU_NOT_FOUND));
+
+        if (!menu.getStore().getOwner().getId().equals(userId)) {
+            throw new MenuException(MenuExceptionCode.ONLY_STORE_OWNER_CAN_MODIFY);
+        }
 
         menu.updateMenu(request.name(), request.price(), request.description(), request.menuImgUrl());
 
@@ -71,10 +79,14 @@ public class MenuService {
     }
 
     @Transactional
-    public void deleteMenu(Long menuId) {
+    public void deleteMenu(Long userId, Long menuId) {
 
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new MenuException(MenuExceptionCode.MENU_NOT_FOUND));
+
+        if (!menu.getStore().getOwner().getId().equals(userId)) {
+            throw new MenuException(MenuExceptionCode.ONLY_STORE_OWNER_CAN_MODIFY);
+        }
 
         menu.deleteMenu(true);
     }

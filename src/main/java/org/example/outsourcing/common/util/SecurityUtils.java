@@ -11,6 +11,4 @@ public class SecurityUtils {
 	}
 }
 
-//auth user 도메인 등 여러곳에서 참조되어 common 하위로 이동시켰습니다
-
 

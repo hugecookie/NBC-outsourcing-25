@@ -23,9 +23,9 @@ public class AccessJwtFilter extends BaseJwtFilter {
 		}
 
 		return (FilterConstants.WHITE_LIST.stream()
-			.anyMatch(uri::contains)
-			&& !method.equals("DELETE"))
-			|| uri.equals(FilterConstants.REISSUE);
+			.anyMatch(uri::contains))
+			|| (uri.equals(FilterConstants.USER_CRUD) && method.equals("POST"))
+			|| (uri.equals(FilterConstants.REISSUE));
 	}
 
 	@Override

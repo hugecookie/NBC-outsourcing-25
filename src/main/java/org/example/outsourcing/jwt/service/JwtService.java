@@ -52,10 +52,6 @@ public class JwtService {
 		redisService.addBlackListToken(RedisToken.of(accessToken, ttl));
 	}
 
-	/* 아마 필터에서 만료된 토큰이 넘어오지는 않겠지만 만약을 가정하여
-	   블랙리스트에 저장시 만료된 토큰이면 redis 에 저장하지 않습니다
-	   그게 아니라면 ttl 값을 남은 만료시간만큼 계산하여 redis 에 저장합니다 */
-
 	public TokenResponse reissueToken(UserAuth userAuth, String refreshToken) {
 		if (jwtParser.isTokenExpired(refreshToken)) {
 			throw new TokenException(TokenExceptionCode.REFRESH_TOKEN_EXPIRED);

@@ -8,10 +8,14 @@ public record UserDeleteRequest(
 	@NotBlank
 	@Schema(description = "삭제 대상자의 email")
 	String email,
-	@NotBlank
+
 	@Schema(description = "삭제 대상자의 비밀번호")
 	String password
 
 ) {
+	public UserDeleteRequest {
+		if(password == null) {
+			password = "default";
+		}
+	}
 }
-

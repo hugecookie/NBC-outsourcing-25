@@ -1,14 +1,17 @@
 package org.example.outsourcing.domain.notification.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+import org.example.outsourcing.common.base.BaseEntity;
 import org.example.outsourcing.domain.order.entity.Order;
 import org.example.outsourcing.domain.user.entity.User;
 
-import java.time.LocalDateTime;
-
-
 @Entity
-public class Notification {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Getter
+@Builder
+public class Notification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +26,6 @@ public class Notification {
     private Order order;  // 알림과 관련된 주문
 
     @Column(nullable = false)
-    private LocalDateTime createdAt; // 알림 생성 시간
-
-    @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)
@@ -33,5 +33,10 @@ public class Notification {
 
     @Column(nullable = false)
     private boolean isChecked;
+
+    // 알림 읽음 처리 메서드
+    public void markAsRead() {
+        this.isChecked = true;  // 알림을 읽음 처리
+    }
 
 }

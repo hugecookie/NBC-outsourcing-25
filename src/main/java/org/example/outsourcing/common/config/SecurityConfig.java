@@ -5,6 +5,7 @@ import java.util.List;
 import org.example.outsourcing.common.filter.AccessJwtFilter;
 import org.example.outsourcing.common.filter.ExceptionJwtFilter;
 import org.example.outsourcing.common.filter.RefreshJwtFilter;
+import org.example.outsourcing.common.filter.handler.OauthFailureHandler;
 import org.example.outsourcing.common.filter.handler.OauthSuccessHandler;
 import org.example.outsourcing.jwt.service.JwtService;
 import org.springframework.context.annotation.Bean;
@@ -33,12 +34,14 @@ public class SecurityConfig {
 	private final AccessJwtFilter accessJwtFilter;
 	private final ExceptionJwtFilter exceptionJwtFilter;
 	private final OauthSuccessHandler successHandler;
+	private final OauthFailureHandler failureHandler;
 
-	public SecurityConfig(JwtService jwtService, OauthSuccessHandler successHandler) {
+	public SecurityConfig(JwtService jwtService, OauthSuccessHandler successHandler, OauthFailureHandler failureHandler) {
 		this.refreshJwtFilter = new RefreshJwtFilter(jwtService);
 		this.accessJwtFilter = new AccessJwtFilter(jwtService);
 		this.exceptionJwtFilter = new ExceptionJwtFilter();
 		this.successHandler = successHandler;
+		this.failureHandler = failureHandler;
 	}
 
 	@Bean
@@ -64,6 +67,7 @@ public class SecurityConfig {
 				.userInfoEndpoint(ui -> ui
 					.userAuthoritiesMapper(grantedAuthoritiesMapper()))
 				.successHandler(successHandler)
+				.failureHandler(failureHandler)
 			);
 		return http.build();
 	}

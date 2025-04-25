@@ -61,12 +61,16 @@ public class User extends BaseEntity {
 	private Platform platform;
 
 	public void withdraw() {
+		if (Platform.LOCAL != platform) {
+			this.email = "deleted email" + UUID.randomUUID() + "@unknown";
+		}
 		this.name = "deleted user" + UUID.randomUUID();
 		this.isDeleted = true;
 		this.roles.clear();
 	}
 
-	public void changePassword(String newPassword) {
+	public void changeProfileInformation(String name, String newPassword) {
+		this.name = name;
 		this.password = newPassword;
 	}
 

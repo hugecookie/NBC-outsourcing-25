@@ -11,12 +11,33 @@ import java.util.List;
 @Getter
 public class OrderListResponse {
 
-    private final Order order;
+    private final Long orderId;
+
+    private final Long storeId;
+
+    private final String storeName;
+
+    private final String userName;
+
+    private final String phoneNumber;
+
+    private final String deliveryAddress;
+
+    private final Integer totalPrice;
+
+    private final String orderStatus;
 
     private final List<OrderItemResponse> orderItems;
 
     public OrderListResponse(Order order, List<OrderItem> orderItems) {
-        this.order = order;
+        this.orderId = order.getId();
+        this.storeId = order.getStore().getId();
+        this.storeName = order.getStore().getName();
+        this.userName = order.getUser().getName();
+        this.phoneNumber = order.getPhoneNumber();
+        this.deliveryAddress = order.getDeliveryAddress();
+        this.totalPrice = order.getTotalPrice();
+        this.orderStatus = order.getStatus().getDescription();
         this.orderItems = orderItems.stream()
                 .map(OrderItemResponse::from)
                 .toList();
