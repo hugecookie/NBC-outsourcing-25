@@ -2,8 +2,9 @@ package org.example.outsourcing.domain.order.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.outsourcing.common.annotation.OrderLoggingTarget;
 import org.example.outsourcing.common.annotation.ResponseMessage;
-import org.example.outsourcing.domain.order.dto.reponse.OrderItemResponse;
+import org.example.outsourcing.domain.auth.dto.UserAuth;
 import org.example.outsourcing.domain.order.dto.reponse.OrderListResponse;
 import org.example.outsourcing.domain.order.dto.reponse.OrderResponse;
 import org.example.outsourcing.domain.order.dto.request.OrderSaveRequest;
@@ -11,6 +12,7 @@ import org.example.outsourcing.domain.order.dto.request.OrderUpdateRequest;
 import org.example.outsourcing.domain.order.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,18 +25,18 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/orders")
+    @OrderLoggingTarget
     @ResponseMessage("정상적으로 주문 처리 되었습니다.")
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody @Valid OrderSaveRequest request) {
-        // 인증 유저 아이디 받아야함
-        Long userId = 1L;
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody @Valid OrderSaveRequest request,
+                                                     Authentication authentication) {
+        Long userId = getUserId(authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(userId, request));
     }
 
     @GetMapping("/orders")
     @ResponseMessage("정상적으로 주문 조회 처리 되었습니다.")
-    public ResponseEntity<List<OrderListResponse>> getOrders() {
-        // 인증 유저 아이디 받아야함
-        Long userId = 1L;
+    public ResponseEntity<List<OrderListResponse>> getOrders(Authentication authentication) {
+        Long userId = getUserId(authentication);
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrders(userId));
     }
 
@@ -46,21 +48,34 @@ public class OrderController {
 
     @GetMapping("/stores/{storeId}/orders")
     @ResponseMessage("정상적으로 가게 주문 조회 처리 되었습니다.")
-    public ResponseEntity<List<OrderListResponse>> getStoreOrders(@PathVariable Long storeId) {
-        return ResponseEntity.status(HttpStatus.OK).body(orderService.getStoreOrders(storeId));
+    public ResponseEntity<List<OrderListResponse>> getStoreOrders(@PathVariable Long storeId,
+                                                                  Authentication authentication) {
+        Long userId = getUserId(authentication);
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getStoreOrders(userId, storeId));
     }
 
     @PutMapping("/orders/{orderId}")
+    @OrderLoggingTarget
     @ResponseMessage("정상적으로 주문 상태 변경 처리 되었습니다.")
     public ResponseEntity<OrderResponse> updateOrderStatus(@PathVariable Long orderId,
-                                                     @RequestBody OrderUpdateRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(orderService.updateOrderStatus(orderId, request));
+                                                     @RequestBody @Valid OrderUpdateRequest request,
+                                                     Authentication authentication) {
+        Long userId = getUserId(authentication);
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.updateOrderStatus(userId, orderId, request));
     }
 
     @DeleteMapping("/orders/{orderId}")
-    public ResponseEntity<Void> deleteOrder(@PathVariable Long orderId) {
-        orderService.canceledOrder(orderId);
+    @OrderLoggingTarget
+    public ResponseEntity<Void> canceledOrder(@PathVariable Long orderId,
+                                              Authentication authentication) {
+        Long userId = getUserId(authentication);
+        orderService.canceledOrder(userId, orderId);
         return ResponseEntity.noContent().build();
+    }
+
+    private Long getUserId(Authentication authentication) {
+        UserAuth userAuth = (UserAuth) authentication.getPrincipal();
+        return userAuth.getId();
     }
 
 }
