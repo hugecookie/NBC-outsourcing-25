@@ -2,6 +2,8 @@ package org.example.outsourcing.domain.menu.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.outsourcing.common.s3.exception.S3Exception;
+import org.example.outsourcing.common.s3.exception.S3ExceptionCode;
 import org.example.outsourcing.domain.menu.dto.response.MenuResponse;
 import org.example.outsourcing.domain.menu.dto.request.MenuSaveRequest;
 import org.example.outsourcing.domain.menu.dto.request.MenuUpdateRequest;
@@ -14,6 +16,9 @@ import org.example.outsourcing.domain.store.exception.StoreException;
 import org.example.outsourcing.domain.store.exception.StoreExceptionCode;
 import org.example.outsourcing.domain.store.repository.StoreRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.example.outsourcing.common.s3.S3Service;
+import org.example.outsourcing.domain.auth.dto.UserAuth;
 
 import java.util.List;
 
@@ -23,6 +28,7 @@ public class MenuService {
 
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
+    private final S3Service s3Service;
 
     public MenuResponse createMenu(Long storeId, MenuSaveRequest request) {
 
@@ -35,7 +41,7 @@ public class MenuService {
                         .name(request.name())
                         .price(request.price())
                         .description(request.description())
-                        .menuImgUrl(request.menuImgUrl())
+                        .isDeleted(false)
                         .build()
         );
 
@@ -71,6 +77,28 @@ public class MenuService {
                 .orElseThrow(() -> new MenuException(MenuExceptionCode.MENU_NOT_FOUND));
 
         menu.deleteMenu(true);
+    }
+
+    public MenuResponse updateMenuImage(Long menuId, MultipartFile image, UserAuth userAuth) {
+        if (image == null || image.isEmpty()) {
+            throw new S3Exception(S3ExceptionCode.UPLOAD_FAILED);
+        }
+
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new MenuException(MenuExceptionCode.MENU_NOT_FOUND));
+
+        if (!menu.getStore().getOwner().getId().equals(userAuth.getId())) {
+            throw new MenuException(MenuExceptionCode.MENU_FORBIDDEN);
+        }
+
+        String key = s3Service.uploadFile(image);
+        String url = s3Service.getFileUrl(key);
+
+        menu.updateMenu(null, null, null, url);
+
+        menuRepository.save(menu);
+
+        return MenuResponse.from(menu);
     }
 
 }
