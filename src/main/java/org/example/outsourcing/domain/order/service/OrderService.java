@@ -1,6 +1,5 @@
 package org.example.outsourcing.domain.order.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.outsourcing.domain.cart.entity.Cart;
 import org.example.outsourcing.domain.cart.exception.CartException;
@@ -25,6 +24,7 @@ import org.example.outsourcing.domain.user.exception.UserException;
 import org.example.outsourcing.domain.user.exception.UserExceptionCode;
 import org.example.outsourcing.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -39,6 +39,7 @@ public class OrderService {
     private final CartRepository cartRepository;
     private final StoreRepository storeRepository;
 
+    @Transactional
     public OrderResponse createOrder(Long userId, OrderSaveRequest request) {
 
         User user = userRepository.findById(userId)
@@ -70,10 +71,12 @@ public class OrderService {
 
         List<OrderItemResponse> orderItems = orderItemService.createOrderItems(order, carts);
 
+        cartRepository.deleteAllInBatch(carts);
+
         return new OrderResponse(order, orderItems);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<OrderListResponse> getOrders(Long userId) {
 
         User user = userRepository.findById(userId)
@@ -84,17 +87,26 @@ public class OrderService {
         return orderItemService.getOrderItemList(orders);
     }
 
-    public OrderResponse getOrder(Long orderId) {
+    @Transactional(readOnly = true)
+    public OrderResponse getOrder(Long userId, Long orderId) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new OrderException(OrderExceptionCode.OWN_ORDER_ONLY);
+        }
+
+        if (!order.getStore().getOwner().getId().equals(userId)) {
+            throw new OrderException(OrderExceptionCode.OWN_STORE_ONLY);
+        }
 
         List<OrderItemResponse> orderItems = orderItemService.getOrderItem(orderId);
         
         return new OrderResponse(order, orderItems);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<OrderListResponse> getStoreOrders(Long userId, Long storeId) {
 
         Store store = storeRepository.findById(storeId)
