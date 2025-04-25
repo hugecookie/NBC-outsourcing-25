@@ -50,7 +50,15 @@ public class StoreService {
             throw new StoreException(StoreExceptionCode.STORE_LIMIT_EXCEEDED);
         }
 
-        Store store = request.toEntity(user);
+        String imageUrl = null;
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            String key = s3Service.uploadFile(request.getImage());
+            imageUrl = s3Service.getFileUrl(key);
+        } else {
+            imageUrl = "https://hugecookie-out-sourcing.s3.ap-northeast-2.amazonaws.com/%E1%84%83%E1%85%A1%E1%84%8B%E1%85%AE%E1%86%AB%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3.jpeg";
+        }
+
+        Store store = request.toEntity(user, imageUrl);
         storeRepository.save(store);
 
         return StoreResponse.from(store);
