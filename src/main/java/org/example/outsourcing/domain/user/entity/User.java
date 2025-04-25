@@ -70,4 +70,11 @@ public class User extends BaseEntity {
 		this.password = newPassword;
 	}
 
+	public void changeProfileImage(String imageUrl) {
+		this.profileImgUrl = imageUrl;
+	}
+
+	public void applyDefaultProfileImage() {
+		this.profileImgUrl = "https://hugecookie-out-sourcing.s3.ap-northeast-2.amazonaws.com/default-image.png";
+	}
 }

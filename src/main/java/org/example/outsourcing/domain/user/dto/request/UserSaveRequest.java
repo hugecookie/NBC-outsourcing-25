@@ -30,9 +30,7 @@ public record UserSaveRequest(
 	@Pattern(regexp = "^(admin|owner|user)$",
 		message = "Role 입력값은 admin, owner, user 중 하나여야 합니다.")
 	@Schema(description = "계정 생성자의 role(admin, owner, user)")
-	String role,
-	@Schema(description = "계정 이미지 프로필 주소")
-	String profileImgUrl
+	String role
 
 ) {
 }
