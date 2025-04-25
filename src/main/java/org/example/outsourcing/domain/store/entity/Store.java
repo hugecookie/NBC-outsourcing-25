@@ -52,16 +52,15 @@ public class Store extends BaseEntity {
     private String storeImgUrl;
 
     public void updateFrom(StoreRequest dto) {
-        if (dto.name() != null) this.name = dto.name();
-        if (dto.category() != null) this.category = dto.category();
-        if (dto.description() != null) this.description = dto.description();
-        if (dto.address() != null) this.address = dto.address();
-        if (dto.phone() != null) this.phone = dto.phone();
-        if (dto.minPrice() != null) this.minPrice = dto.minPrice();
-        if (dto.shopOpen() != null) this.shopOpen = LocalTime.parse(dto.shopOpen());
-        if (dto.shopClose() != null) this.shopClose = LocalTime.parse(dto.shopClose());
-        if (dto.storeImgUrl() != null) this.storeImgUrl = dto.storeImgUrl();
-        if (dto.status() != null) this.status = StoreStatus.valueOf(dto.status()); // 폐업 처리 포함
+        if (dto.getName() != null) this.name = dto.getName();
+        if (dto.getCategory() != null) this.category = dto.getCategory();
+        if (dto.getDescription() != null) this.description = dto.getDescription();
+        if (dto.getAddress() != null) this.address = dto.getAddress();
+        if (dto.getPhone() != null) this.phone = dto.getPhone();
+        if (dto.getMinPrice() != null) this.minPrice = dto.getMinPrice();
+        if (dto.getShopOpen() != null) this.shopOpen = LocalTime.parse(dto.getShopOpen());
+        if (dto.getShopClose() != null) this.shopClose = LocalTime.parse(dto.getShopClose());
+        if (dto.getStatus() != null) this.status = StoreStatus.valueOf(dto.getStatus());
     }
 
     public void updateStoreImgUrl(String url) {

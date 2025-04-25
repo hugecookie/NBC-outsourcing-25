@@ -9,6 +9,7 @@ import org.example.outsourcing.domain.user.dto.response.UserResponse;
 import org.example.outsourcing.domain.user.dto.request.UserSaveRequest;
 import org.example.outsourcing.domain.user.service.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,11 +21,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -70,5 +73,17 @@ public class UserController {
 	public ResponseEntity<UserResponse> viewUser(
 		@AuthenticationPrincipal UserAuth userAuth) {
 		return ResponseEntity.ok(userService.viewUser(userAuth));
+	}
+
+	@Operation(summary = "프로필 이미지 변경 (본인만 가능)", security = {@SecurityRequirement(name = "bearer-key")})
+	@PutMapping(value = "/{id}/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<Void> updateProfileImage(
+			@PathVariable Long id,
+			@RequestParam MultipartFile image,
+			@AuthenticationPrincipal UserAuth userAuth
+	) {
+
+		userService.updateUserProfileImage(image, id, userAuth);
+		return ResponseEntity.ok().build();
 	}
 }

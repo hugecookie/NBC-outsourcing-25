@@ -15,11 +15,13 @@ import org.example.outsourcing.domain.user.exception.UserException;
 import org.example.outsourcing.domain.user.exception.UserExceptionCode;
 import org.example.outsourcing.domain.user.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
+import org.example.outsourcing.common.s3.S3Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final ApplicationEventPublisher publisher;
+	private final S3Service s3Service;
 
 	@Transactional
 	public void createUser(UserSaveRequest request) {
@@ -44,7 +47,6 @@ public class UserService {
 						.map(UserRole::getRole)
 						.toList()
 				)
-				.profileImgUrl(request.profileImgUrl())
 				.platform(Platform.LOCAL)
 				.build()
 		);
@@ -96,4 +98,22 @@ public class UserService {
 			throw new UserException(UserExceptionCode.WRONG_PASSWORD);
 		}
 	}
+
+	@Transactional
+	public void updateUserProfileImage(MultipartFile image, Long userId, UserAuth userAuth) {
+
+		if (!userAuth.getId().equals(userId)) {
+			throw new UserException(UserExceptionCode.NO_AUTH_FOR_PROFILE_UPDATE);
+		}
+
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND));
+
+		String key = s3Service.uploadFile(image);
+		String imageUrl = s3Service.getFileUrl(key);
+
+		user.changeProfileImage(imageUrl);
+		userRepository.save(user);
+	}
+
 }

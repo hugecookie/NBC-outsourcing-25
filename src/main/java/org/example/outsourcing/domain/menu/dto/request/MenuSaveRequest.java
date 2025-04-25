@@ -12,9 +12,7 @@ public record MenuSaveRequest(
         Integer price,
 
         @NotBlank(message = "설명은 필수 입력 값입니다.")
-        String description,
-
-        String menuImgUrl
+        String description
 
 ) {
 }
