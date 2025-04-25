@@ -10,15 +10,11 @@ import org.example.outsourcing.domain.auth.dto.UserAuth;
 import org.example.outsourcing.domain.store.dto.StoreDetailResponse;
 import org.example.outsourcing.domain.store.dto.StoreRequest;
 import org.example.outsourcing.domain.store.dto.StoreResponse;
-import org.example.outsourcing.domain.store.exception.StoreException;
-import org.example.outsourcing.domain.store.exception.StoreExceptionCode;
 import org.example.outsourcing.domain.store.service.StoreService;
-import org.example.outsourcing.domain.user.entity.User;
-import org.example.outsourcing.domain.user.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,17 +29,15 @@ import java.util.List;
 public class StoreController {
 
     private final StoreService storeService;
-    private final UserRepository userRepository;
 
     @Operation(summary = "가게 등록", security = {@SecurityRequirement(name = "bearer-key")})
     @PostMapping
     @ResponseMessage("가게가 정상적으로 등록되었습니다.")
     public ResponseEntity<StoreResponse> createStore(
             @Valid @RequestBody StoreRequest request,
-            Authentication authentication) {
-        User user = getUser(authentication);
+            @AuthenticationPrincipal UserAuth userAuth) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(storeService.createStore(request, user));
+                .body(storeService.createStore(request, userAuth));
     }
 
     @Operation(summary = "가게 단건 조회")
@@ -63,9 +57,8 @@ public class StoreController {
     public ResponseEntity<StoreResponse> updateStoreImage(
             @PathVariable Long storeId,
             @RequestParam MultipartFile image,
-            Authentication authentication) {
-        User user = getUser(authentication);
-        return ResponseEntity.ok(storeService.updateStoreImage(storeId, image, user));
+            @AuthenticationPrincipal UserAuth userAuth) {
+        return ResponseEntity.ok(storeService.updateStoreImage(storeId, image, userAuth));
     }
 
     @Operation(summary = "가게 수정", security = {@SecurityRequirement(name = "bearer-key")})
@@ -74,16 +67,7 @@ public class StoreController {
     public ResponseEntity<StoreResponse> updateStore(
             @PathVariable Long id,
             @Valid @RequestBody StoreRequest request,
-            Authentication authentication) {
-
-        User user = getUser(authentication);
-        StoreResponse response = storeService.updateStore(id, request, user);
-        return ResponseEntity.ok(response);
-    }
-
-    private User getUser(Authentication authentication) {
-        UserAuth userAuth = (UserAuth) authentication.getPrincipal();
-        return userRepository.findById(userAuth.getId())
-                .orElseThrow(() -> new StoreException(StoreExceptionCode.USER_NOT_FOUND));
+            @AuthenticationPrincipal UserAuth userAuth) {
+        return ResponseEntity.ok(storeService.updateStore(id, request, userAuth));
     }
 }
