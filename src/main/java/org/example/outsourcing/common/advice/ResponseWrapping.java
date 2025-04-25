@@ -26,10 +26,6 @@ public class ResponseWrapping implements ResponseBodyAdvice<Object> {
 		return declaringClass.isAnnotationPresent(RestController.class);
 	}
 
-	/* or 조건으로 @ResponseBody 까지 검사하면 exceptionHandler 도 여기서 랩핑 되서
-	   일단 현재 계획은 ExceptionHandler 는 따로 또 ResponseBodyAdvice 를 만들던지
-	   혹은 exceptionHandler 내부에서 랩핑하던지 하게끔 처리할 예정입니다      */
-
 	@Override
 	public Object beforeBodyWrite(
 		Object body,
@@ -46,8 +42,6 @@ public class ResponseWrapping implements ResponseBodyAdvice<Object> {
 			return body;
 		}
 
-		//swagger 내용물도 랩핑해버리므로 해당 경로는 예외처리
-
 		if (body instanceof CommonResponse<?>) {
 			return body;
 		}
@@ -56,6 +50,7 @@ public class ResponseWrapping implements ResponseBodyAdvice<Object> {
 		String message = (rm != null)
 			? rm.value()
 			: "정상적으로 수행되었습니다.";
+
 		HttpStatusCode status = response instanceof ServletServerHttpResponse servlet
 			? HttpStatusCode.valueOf(servlet.getServletResponse().getStatus())
 			: HttpStatusCode.valueOf(HttpStatus.OK.value());

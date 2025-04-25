@@ -15,7 +15,11 @@ public class AccessJwtFilter extends BaseJwtFilter {
 	@Override
 	protected boolean shouldSkip(HttpServletRequest request) {
 		String uri = request.getRequestURI();
-		return FilterConstants.WHITE_LIST.stream().anyMatch(uri::contains)
+		String method = request.getMethod();
+
+		return (FilterConstants.WHITE_LIST.stream()
+			.anyMatch(uri::contains)
+			&& !method.equals("DELETE"))
 			|| uri.equals(FilterConstants.REISSUE);
 	}
 

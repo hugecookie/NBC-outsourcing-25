@@ -11,7 +11,8 @@ public enum UserRole {
 
 	ADMIN("ROLE_admin", "admin"::equals),
 	USER("ROLE_user", "user"::equals),
-	OWNER("ROLE_owner", "owner"::equals);
+	OWNER("ROLE_owner", "owner"::equals),
+	SOCIAL("ROLE_social", "social"::equals);
 
 	private final String role;
 	private final Predicate<String> func;
