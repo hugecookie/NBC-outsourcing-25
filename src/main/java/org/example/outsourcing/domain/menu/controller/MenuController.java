@@ -11,9 +11,12 @@ import org.example.outsourcing.domain.menu.dto.request.MenuSaveRequest;
 import org.example.outsourcing.domain.menu.dto.request.MenuUpdateRequest;
 import org.example.outsourcing.domain.menu.service.MenuService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -73,6 +76,17 @@ public class MenuController {
         Long userId = userAuth.getId();
         menuService.deleteMenu(userId, menuId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "메뉴 이미지 변경", security = {@SecurityRequirement(name = "bearer-key")})
+    @PutMapping(value = "/menus/{menuId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MenuResponse> updateMenuImage(
+            @PathVariable Long menuId,
+            @RequestParam MultipartFile image,
+            @AuthenticationPrincipal UserAuth userAuth
+    ) {
+        MenuResponse updatedMenu = menuService.updateMenuImage(menuId, image, userAuth);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedMenu);
     }
 
 }
