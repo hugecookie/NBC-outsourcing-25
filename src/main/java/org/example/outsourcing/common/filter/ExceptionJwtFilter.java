@@ -1,9 +1,11 @@
 package org.example.outsourcing.common.filter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.example.outsourcing.common.dto.CommonResponse;
 import org.example.outsourcing.common.filter.exception.FilterException;
+import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,8 +30,9 @@ public class ExceptionJwtFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		} catch (FilterException filterException) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
+			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
 			objectMapper.writeValue(
 				response.getWriter(),
 				CommonResponse.from(filterException.getResponseCode())

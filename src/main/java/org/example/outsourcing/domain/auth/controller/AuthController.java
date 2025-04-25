@@ -6,7 +6,6 @@ import org.example.outsourcing.domain.auth.dto.response.TokenResponse;
 import org.example.outsourcing.domain.auth.dto.request.loginRequest;
 import org.example.outsourcing.domain.auth.service.AuthService;
 import org.example.outsourcing.common.util.SecurityUtils;
-import org.example.outsourcing.domain.user.dto.response.UserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,7 +32,7 @@ public class AuthController {
 
 	@Operation(summary = "로그인")
 	@SecurityRequirements({})
-	@ResponseMessage("정상적으로 로그인이이 되었습니다.")
+	@ResponseMessage("정상적으로 로그인이 되었습니다.")
 	@PostMapping("/signin")
 	public ResponseEntity<TokenResponse> singIn(@RequestBody @Validated loginRequest request) {
 		return ResponseEntity.ok(authService.sighIn(request));
@@ -56,7 +55,8 @@ public class AuthController {
 	}
 
 	@Operation(hidden = true)
-	@PreAuthorize("hasRole('social')")
+	@PreAuthorize("@auth.requiredSocial(authentication.getAuthorities())")
+	@ResponseMessage("정상적으로 소셜 로그인이 되었습니다.")
 	@GetMapping("/social/login")
 	public ResponseEntity<TokenResponse> socialSignIn(@AuthenticationPrincipal OAuth2User oAuth) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(authService.socialSignIn(oAuth));

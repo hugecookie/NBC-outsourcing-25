@@ -1,12 +1,12 @@
 package org.example.outsourcing.common.advice;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.example.outsourcing.common.annotation.ResponseMessage;
 import org.example.outsourcing.common.dto.CommonResponse;
-import org.example.outsourcing.domain.auth.dto.response.TokenResponse;
+import org.example.outsourcing.common.exception.BaseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -38,8 +38,24 @@ public class GlobalExceptionHandler {
 			.body(CommonResponse.of(false, errorMessage, 400, null));
 	}
 
+	@ExceptionHandler(BaseException.class)
+	public ResponseEntity<CommonResponse<Void>> handleBaseException(
+		BaseException e
+	) {
+		return ResponseEntity.status(e.getHttpStatus()).body(CommonResponse.from(e.getResponseCode()));
+	}
+
 	@ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
-	public ResponseEntity<CommonResponse<Void>> handleAccessDenied(Exception ex) {
-		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(CommonResponse.of(false, "접근권한이 없습니다.", 403, null));
+	public ResponseEntity<CommonResponse<Void>> handleAccessDeniedException(Exception ex) {
+		return ResponseEntity
+			.status(HttpStatus.FORBIDDEN)
+			.body(
+				CommonResponse.of(
+					false,
+					"접근권한이 없습니다.",
+					HttpServletResponse.SC_FORBIDDEN,
+					null
+				)
+			);
 	}
 }

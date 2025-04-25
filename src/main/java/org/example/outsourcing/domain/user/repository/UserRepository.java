@@ -11,5 +11,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	boolean existsByEmailAndPlatform(String email, Platform platform);
 
 	Optional<User> findByEmailAndPlatformAndIsDeleted(String email, Platform platform, boolean isDeleted);
+
+	Optional<User> findByEmailAndIsDeleted(String email, boolean isDeleted);
 }
 
