@@ -45,4 +45,9 @@ bin/
 *.yml
 *.properties
 
+# firebase
+.resources
+push-notification.json
+
+.env
 .idea/
