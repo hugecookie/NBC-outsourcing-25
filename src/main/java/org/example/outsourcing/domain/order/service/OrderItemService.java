@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.outsourcing.domain.cart.entity.Cart;
 import org.example.outsourcing.domain.order.dto.reponse.OrderItemResponse;
 import org.example.outsourcing.domain.order.dto.reponse.OrderListResponse;
-import org.example.outsourcing.domain.order.dto.reponse.OrderResponse;
 import org.example.outsourcing.domain.order.entity.Order;
 import org.example.outsourcing.domain.order.entity.OrderItem;
 import org.example.outsourcing.domain.order.repository.OrderItemRepository;

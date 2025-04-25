@@ -95,10 +95,14 @@ public class OrderService {
     }
 
     @Transactional
-    public List<OrderListResponse> getStoreOrders(Long storeId) {
+    public List<OrderListResponse> getStoreOrders(Long userId, Long storeId) {
 
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
+
+        if (!store.getOwner().getId().equals(userId)) {
+            throw new OrderException(OrderExceptionCode.OWN_STORE_ONLY);
+        }
 
         List<Order> orders = orderRepository.findAllByStore(store);
 
@@ -106,10 +110,14 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse updateOrderStatus(Long orderId, OrderUpdateRequest request) {
+    public OrderResponse updateOrderStatus(Long userId, Long orderId, OrderUpdateRequest request) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
+
+        if (!order.getStore().getOwner().getId().equals(userId)) {
+            throw new OrderException(OrderExceptionCode.NOT_ORDER_STORE_OWNER);
+        }
 
         if (order.getStatus().equals(OrderStatus.CANCELED)) {
             throw new OrderException(OrderExceptionCode.INVALID_ORDER_STATUS);
@@ -123,10 +131,14 @@ public class OrderService {
     }
 
     @Transactional
-    public void canceledOrder(Long orderId) {
+    public void canceledOrder(Long userId, Long orderId) {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new OrderException(OrderExceptionCode.NOT_ORDER_OWNER);
+        }
 
         if (order.getStatus() != OrderStatus.ACCEPTED) {
             throw new OrderException(OrderExceptionCode.COOKING_ALREADY_STARTED);

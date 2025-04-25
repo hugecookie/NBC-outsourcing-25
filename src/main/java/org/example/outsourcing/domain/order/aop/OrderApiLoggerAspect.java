@@ -1,0 +1,60 @@
+package org.example.outsourcing.domain.order.aop;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.example.outsourcing.domain.order.dto.reponse.OrderResponse;
+import org.example.outsourcing.domain.order.exception.OrderException;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.time.LocalDateTime;
+
+@Slf4j
+@Aspect
+@Component
+public class OrderApiLoggerAspect {
+
+    @Around("@annotation(org.example.outsourcing.common.annotation.OrderLoggingTarget)")
+    public Object doOrderLog(ProceedingJoinPoint joinPoint) throws Throwable {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+
+        String requestUrl = request.getRequestURL().toString();
+        LocalDateTime requestTime = LocalDateTime.now();
+
+        Long orderId = null;
+        Long storeId = null;
+
+        try {
+            Object result = joinPoint.proceed();
+
+            // void
+            if (result == null) {
+                Object[] args = joinPoint.getArgs();
+                for (Object arg : args) {
+                    if (arg instanceof Long) {
+                        orderId = (Long) arg;
+                    }
+                }
+                log.info("[ORDER LOG] 요청 시각: {}, 가게 ID: {}, 주문 ID: {}", requestTime, storeId, orderId);
+                return null;
+            }
+
+            if (result instanceof OrderResponse response) {
+                orderId = response.getOrderId();
+                storeId = response.getStoreId();
+            }
+
+            log.info("[ORDER LOG] 요청 시각: {}, 가게 ID: {}, 주문 ID: {}", requestTime, storeId, orderId);
+            return result;
+
+        } catch (OrderException e) {
+            log.error("[ORDER LOG] 예외 발생 - 시각: {}, URL: {}, 에러: {}", requestTime, requestUrl, e.getMessage(), e);
+            throw e;
+        }
+    }
+}
+

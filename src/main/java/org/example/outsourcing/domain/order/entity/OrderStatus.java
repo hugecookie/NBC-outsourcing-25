@@ -13,6 +13,6 @@ public enum OrderStatus {
     COMPLETED("배달 완료"),
     CANCELED("주문 취소");
 
-    private final String status;
+    private final String description;
 
 }
