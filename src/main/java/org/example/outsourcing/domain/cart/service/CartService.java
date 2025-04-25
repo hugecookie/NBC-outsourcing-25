@@ -24,6 +24,7 @@ import org.example.outsourcing.domain.user.exception.UserExceptionCode;
 import org.example.outsourcing.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -43,12 +44,14 @@ public class CartService {
         Store newStore = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
 
+        LocalTime currentTime = LocalTime.now();
+
+        if (currentTime.isBefore(newStore.getShopOpen()) || currentTime.isAfter(newStore.getShopClose())) {
+            throw new CartException(CartExceptionCode.SHOP_CLOSED);
+        }
+
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new MenuException(MenuExceptionCode.MENU_NOT_FOUND));
-
-        if (!request.price().equals(menu.getPrice())) {
-            throw new CartException(CartExceptionCode.INVALID_PRICE);
-        }
 
         refreshCartByStore(user, newStore);
 
@@ -83,10 +86,14 @@ public class CartService {
     }
 
     @Transactional
-    public CartItemResponse updateCart(Long cartId, CartUpdateRequest request) {
+    public CartItemResponse updateCart(Long userId, Long cartId, CartUpdateRequest request) {
 
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new CartException(CartExceptionCode.CART_ITEM_NOT_FOUND));
+
+        if (!cart.getUser().getId().equals(userId)) {
+            throw new CartException(CartExceptionCode.ONLY_CART_OWNER_CAN_MODIFY);
+        }
 
         cart.updateCart(request.quantity());
 
@@ -101,16 +108,26 @@ public class CartService {
 
         List<Cart> carts = cartRepository.findAllByUser(user);
 
-        if (carts.isEmpty()) return;
+        if (carts.isEmpty()) {
+            throw new CartException(CartExceptionCode.CART_EMPTY);
+        }
+
+        if (!carts.get(0).getUser().getId().equals(userId)) {
+            throw new CartException(CartExceptionCode.ONLY_CART_OWNER_CAN_MODIFY);
+        }
 
         cartRepository.deleteAllByUser(user);
     }
 
     @Transactional
-    public void deleteCartItem(Long cartId) {
+    public void deleteCartItem(Long userId, Long cartId) {
 
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new CartException(CartExceptionCode.CART_ITEM_NOT_FOUND));
+
+        if (!cart.getUser().getId().equals(userId)) {
+            throw new CartException(CartExceptionCode.ONLY_CART_OWNER_CAN_MODIFY);
+        }
 
         cartRepository.delete(cart);
     }
