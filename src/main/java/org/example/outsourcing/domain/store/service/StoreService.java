@@ -3,6 +3,8 @@ package org.example.outsourcing.domain.store.service;
 import lombok.RequiredArgsConstructor;
 import org.example.outsourcing.common.s3.S3Service;
 import org.example.outsourcing.domain.auth.dto.UserAuth;
+import org.example.outsourcing.domain.menu.dto.response.MenuResponse;
+import org.example.outsourcing.domain.menu.service.MenuService;
 import org.example.outsourcing.domain.store.dto.StoreDetailResponse;
 import org.example.outsourcing.domain.store.dto.StoreRequest;
 import org.example.outsourcing.domain.store.dto.StoreResponse;
@@ -28,6 +30,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    private final MenuService menuService;
 
     /**
      * 가게 생성
@@ -76,7 +79,8 @@ public class StoreService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
 
-        return StoreDetailResponse.from(store);
+        List<MenuResponse> menus = menuService.getMenusByStoreId(storeId);
+        return StoreDetailResponse.from(store, menus);
     }
 
     /**
