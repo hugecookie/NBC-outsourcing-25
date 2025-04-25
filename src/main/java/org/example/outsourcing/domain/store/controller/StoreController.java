@@ -31,10 +31,9 @@ public class StoreController {
     private final StoreService storeService;
 
     @Operation(summary = "가게 등록", security = {@SecurityRequirement(name = "bearer-key")})
-    @PostMapping
-    @ResponseMessage("가게가 정상적으로 등록되었습니다.")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<StoreResponse> createStore(
-            @Valid @RequestBody StoreRequest request,
+            @ModelAttribute StoreRequest request,
             @AuthenticationPrincipal UserAuth userAuth) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(storeService.createStore(request, userAuth));
