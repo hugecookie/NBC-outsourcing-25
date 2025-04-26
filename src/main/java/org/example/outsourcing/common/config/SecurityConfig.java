@@ -62,7 +62,7 @@ public class SecurityConfig {
 					ep.baseUri("/api/auth/oauth2/signin")
 				)
 				.redirectionEndpoint(re ->
-					re.baseUri("/api/auth/oauth2/callback/*")
+					re.baseUri("/api/auth/oauth2/callback/google")
 				)
 				.userInfoEndpoint(ui -> ui
 					.userAuthoritiesMapper(grantedAuthoritiesMapper()))

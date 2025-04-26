@@ -37,6 +37,9 @@ dependencies {
     implementation "software.amazon.awssdk:auth:$awsSdkVersion"
     implementation "software.amazon.awssdk:regions:$awsSdkVersion"
 
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
     // Firebase 의존성 추가
     implementation 'com.google.firebase:firebase-admin:9.1.1'  // Firebase Admin SDK
     compileOnly 'org.projectlombok:lombok'
