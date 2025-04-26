@@ -50,9 +50,9 @@ public class UserController {
 	@Operation(summary = "회원탈퇴", security = {@SecurityRequirement(name = "bearer-key")})
 	@DeleteMapping
 	@ResponseMessage("정상적으로 탈퇴처리 되었습니다.")
-	public ResponseEntity<Void> withDrawUser(
+	public ResponseEntity<Void> withdrawUser(
 		@RequestBody @Validated UserDeleteRequest request) {
-		userService.withDrawUser(request, SecurityUtils.getCurrentToken());
+		userService.withdrawUser(request, SecurityUtils.getCurrentToken());
 		SecurityUtils.clearContext();
 		return ResponseEntity.ok().build();
 	}

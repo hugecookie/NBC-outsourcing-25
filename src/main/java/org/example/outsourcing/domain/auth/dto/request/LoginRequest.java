@@ -3,7 +3,7 @@ package org.example.outsourcing.domain.auth.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
-public record loginRequest(
+public record LoginRequest(
 
 	@NotBlank
 	@Schema(description = "로그인 대상자의 email")

@@ -3,7 +3,7 @@ package org.example.outsourcing.domain.auth.controller;
 import org.example.outsourcing.common.annotation.ResponseMessage;
 import org.example.outsourcing.domain.auth.dto.UserAuth;
 import org.example.outsourcing.domain.auth.dto.response.TokenResponse;
-import org.example.outsourcing.domain.auth.dto.request.loginRequest;
+import org.example.outsourcing.domain.auth.dto.request.LoginRequest;
 import org.example.outsourcing.domain.auth.service.AuthService;
 import org.example.outsourcing.common.util.SecurityUtils;
 import org.springframework.http.HttpStatus;
@@ -34,7 +34,7 @@ public class AuthController {
 	@SecurityRequirements({})
 	@ResponseMessage("정상적으로 로그인이 되었습니다.")
 	@PostMapping("/signin")
-	public ResponseEntity<TokenResponse> singIn(@RequestBody @Validated loginRequest request) {
+	public ResponseEntity<TokenResponse> singIn(@RequestBody @Validated LoginRequest request) {
 		return ResponseEntity.ok(authService.sighIn(request));
 	}
 

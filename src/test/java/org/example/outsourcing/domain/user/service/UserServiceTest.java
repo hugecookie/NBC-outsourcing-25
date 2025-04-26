@@ -19,6 +19,7 @@ import org.example.outsourcing.domain.user.event.UserWithDrawEvent;
 import org.example.outsourcing.domain.user.exception.UserException;
 import org.example.outsourcing.domain.user.exception.UserExceptionCode;
 import org.example.outsourcing.domain.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -53,10 +54,10 @@ class UserServiceTest {
 
 	private User localUser;
 	private User socialUser;
-	private UserSaveRequest userSaveRequest;
-	private UserDeleteRequest userDeleteRequest;
-	private UserModifyRequest userModifyRequest;
 	private UserAuth userAuth;
+	private static UserSaveRequest userSaveRequest;
+	private static UserDeleteRequest userDeleteRequest;
+	private static UserModifyRequest userModifyRequest;
 
 	private static final String ENCODED_PASSWORD = "encodedPassword";
 
@@ -65,7 +66,6 @@ class UserServiceTest {
 
 	@BeforeEach
 	void setUp() {
-
 		localUser = User.builder()
 			.id(1L)
 			.roles(new ArrayList<>(List.of("ROLE_user")))
@@ -86,11 +86,14 @@ class UserServiceTest {
 			.password("P@ssw0rd1225")
 			.build();
 
+		userAuth = UserAuth.from(localUser);
+	}
+
+	@BeforeAll
+	static void setUpOnce() {
 		userSaveRequest = new UserSaveRequest("test@unknow.com", "익명123", "P@ssw0rd1225", "user");
 		userDeleteRequest = new UserDeleteRequest("test@unknow.com", "P@ssw0rd1225");
 		userModifyRequest = new UserModifyRequest("test@unknow.com", "P@ssw0rd1225", "익명456", "P@ssw0rd1224");
-		userAuth = UserAuth.from(localUser);
-
 	}
 
 	@Nested
@@ -100,15 +103,14 @@ class UserServiceTest {
 		@Test
 		@DisplayName("유저 생성 성공")
 		void createUser() {
-
-			//given
+			// given
 			given(userRepository.existsByEmailAndPlatform(anyString(), any())).willReturn(false);
 			given(passwordEncoder.encode(anyString())).willReturn(ENCODED_PASSWORD);
 
-			//when
+			// when
 			userService.createUser(userSaveRequest);
 
-			//then
+			// then
 			verify(userRepository, times(1)).save(userCaptor.capture());
 			assertAll(
 				() -> assertEquals(userSaveRequest.email(), userCaptor.getValue().getEmail()),
@@ -120,17 +122,17 @@ class UserServiceTest {
 
 		@Test
 		@DisplayName("로컬 유저 탈퇴 성공")
-		void withDrawUser() {
-
-			//given
-			given(userRepository.findByEmailAndIsDeleted(anyString(), anyBoolean())).willReturn(Optional.of(localUser));
+		void withdrawUser() {
+			// given
+			given(userRepository.findByEmailAndIsDeleted(anyString(), anyBoolean()))
+				.willReturn(Optional.of(localUser));
 			given(passwordEncoder.matches(anyString(), anyString())).willReturn(true);
 			String beforeName = localUser.getName();
 
-			//when
-			userService.withDrawUser(userDeleteRequest, "accessToken");
+			// when
+			userService.withdrawUser(userDeleteRequest, "accessToken");
 
-			//then
+			// then
 			verify(publisher, times(1)).publishEvent(any(UserWithDrawEvent.class));
 			assertAll(
 				() -> assertNotEquals(localUser.getName(), beforeName),
@@ -141,17 +143,16 @@ class UserServiceTest {
 
 		@Test
 		@DisplayName("소셜 유저 탈퇴 성공")
-		void withDrawSocialUser() {
-
-			//given
-			given(userRepository.findByEmailAndIsDeleted(anyString(), anyBoolean())).willReturn(
-				Optional.of(socialUser));
+		void withdrawSocialUser() {
+			// given
+			given(userRepository.findByEmailAndIsDeleted(anyString(), anyBoolean()))
+				.willReturn(Optional.of(socialUser));
 			String beforeName = socialUser.getName();
 
-			//when
-			userService.withDrawUser(userDeleteRequest, "accessToken");
+			// when
+			userService.withdrawUser(userDeleteRequest, "accessToken");
 
-			//then
+			// then
 			verify(publisher, times(1)).publishEvent(any(UserWithDrawEvent.class));
 			assertAll(
 				() -> assertNotEquals(socialUser.getEmail(), userDeleteRequest.email()),
@@ -164,17 +165,16 @@ class UserServiceTest {
 		@Test
 		@DisplayName("유저 수정 성공")
 		void modifyUser() {
-
-			//given
-			given(userRepository.findByEmailAndPlatformAndIsDeleted(anyString(), any(Platform.class),
-				anyBoolean())).willReturn(Optional.of(localUser));
+			// given
+			given(userRepository.findByEmailAndPlatformAndIsDeleted(anyString(), any(Platform.class), anyBoolean()))
+				.willReturn(Optional.of(localUser));
 			given(passwordEncoder.matches(anyString(), anyString())).willReturn(true);
 			given(passwordEncoder.encode(anyString())).willReturn(ENCODED_PASSWORD);
 
-			//when
+			// when
 			userService.modifyUser(userModifyRequest);
 
-			//then
+			// then
 			assertAll(
 				() -> assertEquals(localUser.getName(), userModifyRequest.name()),
 				() -> assertEquals(localUser.getPassword(), ENCODED_PASSWORD)
@@ -184,14 +184,13 @@ class UserServiceTest {
 		@Test
 		@DisplayName("유저 조회 성공")
 		void viewUser() {
-
-			//given
+			// given
 			given(userRepository.findById(anyLong())).willReturn(Optional.of(localUser));
 
-			//when
+			// when
 			UserResponse userResponse = userService.viewUser(userAuth);
 
-			//then
+			// then
 			assertAll(
 				() -> assertEquals(localUser.getName(), userResponse.name()),
 				() -> assertEquals(localUser.getEmail(), userResponse.email()),
@@ -199,61 +198,62 @@ class UserServiceTest {
 				() -> assertEquals(localUser.getCreatedAt(), userResponse.createdAt())
 			);
 		}
-
 	}
 
 	@Nested
-	@DisplayName("유저 서비스 실패")
+	@DisplayName("유저 서비스 실패 테스트")
 	class UserServiceFailureTest {
 
 		@Test
 		@DisplayName("유저 생성 실패")
 		void createUser() {
-
-			//given
+			// given
 			given(userRepository.existsByEmailAndPlatform(anyString(), any())).willReturn(true);
 
-			//when
-			UserException userException = assertThrows(UserException.class,
-				() -> userService.createUser(userSaveRequest));
+			// when
+			UserException userException = assertThrows(
+				UserException.class,
+				() -> userService.createUser(userSaveRequest)
+			);
 
-			//then
+			// then
 			assertEquals(UserExceptionCode.ALREADY_EXISTS_EMAIL, userException.getResponseCode());
 		}
 
 		@Test
 		@DisplayName("로컬 유저 탈퇴 실패(비밀번호 불일치)")
-		void withDrawUser() {
-
-			//given
-			given(userRepository.findByEmailAndIsDeleted(anyString(), anyBoolean())).willReturn(Optional.of(localUser));
+		void withdrawUser() {
+			// given
+			given(userRepository.findByEmailAndIsDeleted(anyString(), anyBoolean()))
+				.willReturn(Optional.of(localUser));
 			given(passwordEncoder.matches(anyString(), anyString())).willReturn(false);
 
-			//when
-			UserException userException = assertThrows(UserException.class,
-				() -> userService.withDrawUser(userDeleteRequest, "accessToken"));
+			// when
+			UserException userException = assertThrows(
+				UserException.class,
+				() -> userService.withdrawUser(userDeleteRequest, "accessToken")
+			);
 
-			//then
+			// then
 			assertEquals(UserExceptionCode.WRONG_PASSWORD, userException.getResponseCode());
 		}
 
 		@Test
 		@DisplayName("유저 수정 실패")
 		void modifyUser() {
-
-			//given
-			given(userRepository.findByEmailAndPlatformAndIsDeleted(anyString(), any(Platform.class),
-				anyBoolean())).willReturn(Optional.of(localUser));
+			// given
+			given(userRepository.findByEmailAndPlatformAndIsDeleted(anyString(), any(Platform.class), anyBoolean()))
+				.willReturn(Optional.of(localUser));
 			given(passwordEncoder.matches(anyString(), anyString())).willReturn(false);
 
-			//when
-			UserException userException = assertThrows(UserException.class,
-				() -> userService.modifyUser(userModifyRequest));
+			// when
+			UserException userException = assertThrows(
+				UserException.class,
+				() -> userService.modifyUser(userModifyRequest)
+			);
 
-			//then
+			// then
 			assertEquals(UserExceptionCode.WRONG_PASSWORD, userException.getResponseCode());
 		}
-
 	}
-
 }

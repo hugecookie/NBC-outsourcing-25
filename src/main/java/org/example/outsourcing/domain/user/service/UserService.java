@@ -53,7 +53,7 @@ public class UserService {
 	}
 
 	@Transactional
-	public void withDrawUser(UserDeleteRequest request, String accessToken) {
+	public void withdrawUser(UserDeleteRequest request, String accessToken) {
 		User user = userRepository.findByEmailAndIsDeleted(request.email(), false)
 			.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND));
 
