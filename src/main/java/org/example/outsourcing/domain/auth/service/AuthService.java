@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.example.outsourcing.domain.auth.dto.response.TokenResponse;
 import org.example.outsourcing.domain.auth.dto.UserAuth;
-import org.example.outsourcing.domain.auth.dto.request.loginRequest;
+import org.example.outsourcing.domain.auth.dto.request.LoginRequest;
 import org.example.outsourcing.domain.user.entity.Platform;
 import org.example.outsourcing.domain.user.entity.User;
 import org.example.outsourcing.domain.user.entity.UserRole;
@@ -30,7 +30,7 @@ public class AuthService {
 	private final JwtService jwtService;
 
 	@Transactional
-	public TokenResponse sighIn(loginRequest request) {
+	public TokenResponse sighIn(LoginRequest request) {
 
 		User user = userRepository.findByEmailAndPlatformAndIsDeleted(request.email(), Platform.LOCAL, false)
 			.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND));
@@ -56,7 +56,7 @@ public class AuthService {
 					User.builder()
 						.email(email)
 						.name(name)
-						.roles(List.of(UserRole.SOCIAL.getRole(), UserRole.USER.getRole()))
+						.roles(List.of(UserRole.SOCIAL.getRole()))
 						.password(UUID.randomUUID().toString())
 						.platform(Platform.GOOGLE)
 						.build()
