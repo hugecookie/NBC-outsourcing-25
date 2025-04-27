@@ -10,7 +10,6 @@ public class FilterConstants {
 
 	public static final List<String> WHITE_LIST = List.of(
 		"/api/auth/signin",
-		"/api/auth/oauth2/signin/google",
 		"/resources",
 		"/swagger-ui",
 		"/v3/api-docs",

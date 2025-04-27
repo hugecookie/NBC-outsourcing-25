@@ -14,6 +14,8 @@ import org.example.outsourcing.domain.auth.dto.UserAuth;
 
 import org.example.outsourcing.domain.auth.dto.request.LoginRequest;
 import org.example.outsourcing.domain.auth.dto.response.TokenResponse;
+import org.example.outsourcing.domain.auth.exception.AuthException;
+import org.example.outsourcing.domain.auth.exception.AuthExceptionCode;
 import org.example.outsourcing.domain.user.entity.Platform;
 import org.example.outsourcing.domain.user.entity.User;
 import org.example.outsourcing.domain.user.exception.UserException;
@@ -60,6 +62,8 @@ class AuthServiceTest {
 
 	private static final String ACCESS_TOKEN = "accessToken";
 	private static final String REFRESH_TOKEN = "refreshToken";
+	private static final String REGISTRATION_ID_GOOGLE = "google";
+	private static final String REGISTRATION_ID_KAKAO = "kakao";
 
 	@BeforeAll
 	static void setUpOnce() {
@@ -146,12 +150,12 @@ class AuthServiceTest {
 			given(jwtService.generateToken(any(UserAuth.class), any(Date.class))).willReturn(tokenResponse);
 
 			//when
-			TokenResponse checkTokenResponse = authService.socialSignIn(oAuthUser);
+			TokenResponse checkTokenResponseGoogle = authService.socialSignIn(oAuthUser, REGISTRATION_ID_GOOGLE);
 
 			//then
 			assertAll(
-				() -> assertEquals(tokenResponse.accessToken(), checkTokenResponse.accessToken()),
-				() -> assertEquals(tokenResponse.refreshToken(), checkTokenResponse.refreshToken())
+				() -> assertEquals(tokenResponse.accessToken(), checkTokenResponseGoogle.accessToken()),
+				() -> assertEquals(tokenResponse.refreshToken(), checkTokenResponseGoogle.refreshToken())
 			);
 		}
 
@@ -166,7 +170,7 @@ class AuthServiceTest {
 			given(jwtService.generateToken(any(UserAuth.class), any(Date.class))).willReturn(tokenResponse);
 
 			//when
-			TokenResponse checkTokenResponse = authService.socialSignIn(oAuthUser);
+			TokenResponse checkTokenResponse = authService.socialSignIn(oAuthUser, REGISTRATION_ID_GOOGLE);
 
 			//then
 			assertAll(
@@ -178,8 +182,6 @@ class AuthServiceTest {
 		@Test
 		@DisplayName("로그아웃 성공")
 		void sighOut() {
-
-			//given
 
 			//when
 			authService.sighOut(ACCESS_TOKEN);
@@ -239,5 +241,25 @@ class AuthServiceTest {
 			//then
 			assertEquals(UserExceptionCode.WRONG_PASSWORD, userException.getResponseCode());
 		}
+
+		@Test
+		@DisplayName("소셜 인증 실패(지원하지 않는 프로바이더)")
+		void failureSocialSignIn() {
+
+			//given
+			String wrongRegistrationIdNaver = "naver";
+			String wrongRegistrationIdLocal = "local";
+
+			//when
+			AuthException authException1 = assertThrows(AuthException.class,
+				() -> authService.socialSignIn(oAuthUser, wrongRegistrationIdNaver));
+			AuthException authException2 = assertThrows(AuthException.class,
+				() -> authService.socialSignIn(oAuthUser, wrongRegistrationIdLocal));
+
+			//then
+			assertEquals(AuthExceptionCode.UNSUPPORTED_OAUTH_PROVIDER, authException1.getResponseCode());
+			assertEquals(AuthExceptionCode.UNSUPPORTED_LOCAL_AUTH_PROVIDER, authException2.getResponseCode());
+		}
+
 	}
 }

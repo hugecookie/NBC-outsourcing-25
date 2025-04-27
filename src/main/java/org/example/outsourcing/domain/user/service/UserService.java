@@ -16,11 +16,14 @@ import org.example.outsourcing.domain.user.exception.UserExceptionCode;
 import org.example.outsourcing.domain.user.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.example.outsourcing.common.s3.S3Service;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -34,6 +37,7 @@ public class UserService {
 
 	@Transactional
 	public void createUser(UserSaveRequest request) {
+
 		checkEmail(request.email());
 
 		userRepository.save(
@@ -53,8 +57,10 @@ public class UserService {
 	}
 
 	@Transactional
-	public void withdrawUser(UserDeleteRequest request, String accessToken) {
-		User user = userRepository.findByEmailAndIsDeleted(request.email(), false)
+	@PreAuthorize("@userz.checkUserId(authentication.principal.id, #request.email())")
+	public void withdrawUser(UserDeleteRequest request, Long userId, String accessToken) {
+
+		User user = userRepository.findByIdAndIsDeleted(userId, false)
 			.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND));
 
 		if (user.getPlatform() == Platform.LOCAL) {
@@ -66,37 +72,28 @@ public class UserService {
 	}
 
 	@Transactional
+	@PreAuthorize("hasAnyRole('owner', 'admin', 'user') and @userz.checkUserId(authentication.principal.id, #request.email())")
 	public void modifyUser(UserModifyRequest request) {
+
 		User user = userRepository.findByEmailAndPlatformAndIsDeleted(
 				request.email(), Platform.LOCAL, false
 			)
 			.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND));
 
 		checkPassword(request.password(), user.getPassword());
+
 		user.changeProfileInformation(
 			request.name(),
 			passwordEncoder.encode(request.newPassword())
 		);
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public UserResponse viewUser(UserAuth userAuth) {
 		return UserResponse.from(
 			userRepository.findById(userAuth.getId())
 				.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND))
 		);
-	}
-
-	private void checkEmail(String email) {
-		if (userRepository.existsByEmailAndPlatform(email, Platform.LOCAL)) {
-			throw new UserException(UserExceptionCode.ALREADY_EXISTS_EMAIL);
-		}
-	}
-
-	private void checkPassword(String rawPassword, String hashedPassword) {
-		if (!passwordEncoder.matches(rawPassword, hashedPassword)) {
-			throw new UserException(UserExceptionCode.WRONG_PASSWORD);
-		}
 	}
 
 	@Transactional
@@ -107,7 +104,7 @@ public class UserService {
 		}
 
 		User user = userRepository.findById(userId)
-				.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND));
+			.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND));
 
 		String key = s3Service.uploadFile(image);
 		String imageUrl = s3Service.getFileUrl(key);
@@ -116,4 +113,15 @@ public class UserService {
 		userRepository.save(user);
 	}
 
+	private void checkPassword(String rawPassword, String hashedPassword) {
+		if (!passwordEncoder.matches(rawPassword, hashedPassword)) {
+			throw new UserException(UserExceptionCode.WRONG_PASSWORD);
+		}
+	}
+
+	private void checkEmail(String email) {
+		if (userRepository.existsByEmailAndPlatform(email, Platform.LOCAL)) {
+			throw new UserException(UserExceptionCode.ALREADY_EXISTS_EMAIL);
+		}
+	}
 }

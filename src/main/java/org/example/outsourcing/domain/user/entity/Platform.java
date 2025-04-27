@@ -1,6 +1,6 @@
 package org.example.outsourcing.domain.user.entity;
 
 public enum Platform {
-	GOOGLE, LOCAL
+	GOOGLE, KAKAO, LOCAL;
 }
 
