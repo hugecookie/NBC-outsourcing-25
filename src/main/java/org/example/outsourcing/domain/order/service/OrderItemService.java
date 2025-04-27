@@ -35,7 +35,7 @@ public class OrderItemService {
 
     public List<OrderItemResponse> getOrderItem(Long orderId) {
 
-        return orderItemRepository.findAllById(orderId).stream()
+        return orderItemRepository.findAllByOrderId(orderId).stream()
                 .map(OrderItemResponse::from)
                 .toList();
     }
