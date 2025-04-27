@@ -7,6 +7,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.example.outsourcing.domain.order.dto.reponse.OrderResponse;
 import org.example.outsourcing.domain.order.exception.OrderException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -27,12 +28,17 @@ public class OrderApiLoggerAspect {
 
         Long orderId = null;
         Long storeId = null;
+        Object body = null;
 
         try {
             Object result = joinPoint.proceed();
 
+            if (result instanceof ResponseEntity<?> responseEntity) {
+                body = responseEntity.getBody();
+            }
+
             // void
-            if (result == null) {
+            if (body == null) {
                 Object[] args = joinPoint.getArgs();
                 for (Object arg : args) {
                     if (arg instanceof Long) {
@@ -43,7 +49,7 @@ public class OrderApiLoggerAspect {
                 return null;
             }
 
-            if (result instanceof OrderResponse response) {
+            if (body instanceof OrderResponse response) {
                 orderId = response.getOrderId();
                 storeId = response.getStoreId();
             }
