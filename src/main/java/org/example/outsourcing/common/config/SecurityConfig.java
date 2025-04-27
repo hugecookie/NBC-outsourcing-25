@@ -36,7 +36,8 @@ public class SecurityConfig {
 	private final OauthSuccessHandler successHandler;
 	private final OauthFailureHandler failureHandler;
 
-	public SecurityConfig(JwtService jwtService, OauthSuccessHandler successHandler, OauthFailureHandler failureHandler) {
+	public SecurityConfig(JwtService jwtService, OauthSuccessHandler successHandler,
+		OauthFailureHandler failureHandler) {
 		this.refreshJwtFilter = new RefreshJwtFilter(jwtService);
 		this.accessJwtFilter = new AccessJwtFilter(jwtService);
 		this.exceptionJwtFilter = new ExceptionJwtFilter();
@@ -47,6 +48,13 @@ public class SecurityConfig {
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
+		return authorities -> List.of(
+			(new SimpleGrantedAuthority("ROLE_social"))
+		);
 	}
 
 	@Bean
@@ -62,7 +70,7 @@ public class SecurityConfig {
 					ep.baseUri("/api/auth/oauth2/signin")
 				)
 				.redirectionEndpoint(re ->
-					re.baseUri("/api/auth/oauth2/callback/google")
+					re.baseUri("/api/auth/oauth2/callback/*")
 				)
 				.userInfoEndpoint(ui -> ui
 					.userAuthoritiesMapper(grantedAuthoritiesMapper()))
@@ -70,13 +78,6 @@ public class SecurityConfig {
 				.failureHandler(failureHandler)
 			);
 		return http.build();
-	}
-
-	@Bean
-	public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
-		return authorities -> List.of(
-			(new SimpleGrantedAuthority("ROLE_social"))
-		);
 	}
 
 	@Bean
@@ -120,5 +121,4 @@ public class SecurityConfig {
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
 	}
-
 }

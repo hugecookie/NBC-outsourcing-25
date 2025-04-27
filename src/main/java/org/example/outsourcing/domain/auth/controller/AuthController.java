@@ -8,7 +8,6 @@ import org.example.outsourcing.domain.auth.service.AuthService;
 import org.example.outsourcing.common.util.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -55,11 +55,11 @@ public class AuthController {
 	}
 
 	@Operation(hidden = true)
-	@PreAuthorize("@auth.requiredSocial(authentication.getAuthorities())")
 	@ResponseMessage("정상적으로 소셜 로그인이 되었습니다.")
 	@GetMapping("/social/login")
-	public ResponseEntity<TokenResponse> socialSignIn(@AuthenticationPrincipal OAuth2User oAuth) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(authService.socialSignIn(oAuth));
+	public ResponseEntity<TokenResponse> socialSignIn(@AuthenticationPrincipal OAuth2User oAuth,
+		HttpServletRequest request) {
+		String registrationId = (String)request.getAttribute("oauth2_provider");
+		return ResponseEntity.status(HttpStatus.CREATED).body(authService.socialSignIn(oAuth, registrationId));
 	}
-
 }

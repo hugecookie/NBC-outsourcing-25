@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -46,18 +47,18 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
-	@PreAuthorize("@userz.checkUserId(authentication.principal.id, #request.email())")
 	@Operation(summary = "회원탈퇴", security = {@SecurityRequirement(name = "bearer-key")})
 	@DeleteMapping
 	@ResponseMessage("정상적으로 탈퇴처리 되었습니다.")
 	public ResponseEntity<Void> withdrawUser(
-		@RequestBody @Validated UserDeleteRequest request) {
-		userService.withdrawUser(request, SecurityUtils.getCurrentToken());
+		@RequestBody @Validated UserDeleteRequest request,
+		@AuthenticationPrincipal UserAuth userAuth
+	) {
+		userService.withdrawUser(request, userAuth.getId(), SecurityUtils.getCurrentToken());
 		SecurityUtils.clearContext();
 		return ResponseEntity.ok().build();
 	}
 
-	@PreAuthorize("hasAnyRole('user','admin','owner') and @userz.checkUserId(authentication.principal.id, #request.email())")
 	@Operation(summary = "회원정보수정", security = {@SecurityRequirement(name = "bearer-key")})
 	@PatchMapping
 	@ResponseMessage("정상적으로 수정되었습니다.")
@@ -78,11 +79,10 @@ public class UserController {
 	@Operation(summary = "프로필 이미지 변경 (본인만 가능)", security = {@SecurityRequirement(name = "bearer-key")})
 	@PutMapping(value = "/{id}/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Void> updateProfileImage(
-			@PathVariable Long id,
-			@RequestParam MultipartFile image,
-			@AuthenticationPrincipal UserAuth userAuth
+		@PathVariable Long id,
+		@RequestParam MultipartFile image,
+		@AuthenticationPrincipal UserAuth userAuth
 	) {
-
 		userService.updateUserProfileImage(image, id, userAuth);
 		return ResponseEntity.ok().build();
 	}
