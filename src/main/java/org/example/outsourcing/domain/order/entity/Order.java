@@ -49,4 +49,16 @@ public class Order extends BaseEntity {
     public void canceledOrder(OrderStatus status) {
         this.status = status;
     }
+
+    public boolean isCustomer(Long userId) {
+        return this.getUser().getId().equals(userId);
+    }
+
+    public boolean isOwner(Long userId) {
+        return this.getStore().getOwner().getId().equals(userId);
+    }
+
+    public boolean checkStatus(OrderStatus orderStatus) {
+        return this.getStatus().equals(orderStatus);
+    }
 }

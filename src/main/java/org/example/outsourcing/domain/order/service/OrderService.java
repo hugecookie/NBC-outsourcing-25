@@ -93,11 +93,11 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
 
-        if (!order.getUser().getId().equals(userId)) {
+        if (!order.isCustomer(userId)) {
             throw new OrderException(OrderExceptionCode.OWN_ORDER_ONLY);
         }
 
-        if (!order.getStore().getOwner().getId().equals(userId)) {
+        if (!order.isOwner(userId)) {
             throw new OrderException(OrderExceptionCode.OWN_STORE_ONLY);
         }
 
@@ -112,7 +112,7 @@ public class OrderService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
 
-        if (!store.getOwner().getId().equals(userId)) {
+        if (!store.isOwner(userId)) {
             throw new OrderException(OrderExceptionCode.OWN_STORE_ONLY);
         }
 
@@ -127,11 +127,11 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
 
-        if (!order.getStore().getOwner().getId().equals(userId)) {
+        if (!order.isOwner(userId)) {
             throw new OrderException(OrderExceptionCode.NOT_ORDER_STORE_OWNER);
         }
 
-        if (order.getStatus().equals(OrderStatus.CANCELED)) {
+        if (order.checkStatus(OrderStatus.CANCELED)) {
             throw new OrderException(OrderExceptionCode.INVALID_ORDER_STATUS);
         }
 
@@ -148,11 +148,11 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(OrderExceptionCode.ORDER_NOT_FOUND));
 
-        if (!order.getUser().getId().equals(userId)) {
+        if (!order.isCustomer(userId)) {
             throw new OrderException(OrderExceptionCode.NOT_ORDER_OWNER);
         }
 
-        if (order.getStatus() != OrderStatus.ACCEPTED) {
+        if (!order.checkStatus(OrderStatus.ACCEPTED)) {
             throw new OrderException(OrderExceptionCode.COOKING_ALREADY_STARTED);
         }
 

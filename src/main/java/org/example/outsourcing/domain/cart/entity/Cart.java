@@ -44,4 +44,7 @@ public class Cart extends BaseEntity {
         this.quantity = quantity;
     }
 
+    public boolean isCustomer(Long userId) {
+        return this.getUser().getId().equals(userId);
+    }
 }

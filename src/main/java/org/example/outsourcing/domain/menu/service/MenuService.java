@@ -36,7 +36,7 @@ public class MenuService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
 
-        if (!store.getOwner().getId().equals(userId)) {
+        if (!store.isOwner(userId)) {
             throw new MenuException(MenuExceptionCode.ONLY_STORE_OWNER_CAN_MODIFY);
         }
 
@@ -72,7 +72,7 @@ public class MenuService {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new MenuException(MenuExceptionCode.MENU_NOT_FOUND));
 
-        if (!menu.getStore().getOwner().getId().equals(userId)) {
+        if (!menu.isOwner(userId)) {
             throw new MenuException(MenuExceptionCode.ONLY_STORE_OWNER_CAN_MODIFY);
         }
 
@@ -87,7 +87,7 @@ public class MenuService {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new MenuException(MenuExceptionCode.MENU_NOT_FOUND));
 
-        if (!menu.getStore().getOwner().getId().equals(userId)) {
+        if (!menu.isOwner(userId)) {
             throw new MenuException(MenuExceptionCode.ONLY_STORE_OWNER_CAN_MODIFY);
         }
 
@@ -102,7 +102,7 @@ public class MenuService {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new MenuException(MenuExceptionCode.MENU_NOT_FOUND));
 
-        if (!menu.getStore().getOwner().getId().equals(userAuth.getId())) {
+        if (!menu.isOwner(userAuth.getId())) {
             throw new MenuException(MenuExceptionCode.MENU_FORBIDDEN);
         }
 
