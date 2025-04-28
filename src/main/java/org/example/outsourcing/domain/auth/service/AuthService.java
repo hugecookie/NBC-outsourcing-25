@@ -37,6 +37,13 @@ public class AuthService {
 	private record UserInfo(String email, String name) {
 	}
 
+	/**
+	 * 회원 로그인<br>
+	 * 유저 정보를 검증 한 후, 액세스 토큰, 리프레시 토큰 발급
+	 * @param request 이메일, 비밀번호
+	 * @return 액세스 토큰, 리프레시 토큰
+	 * @author 박경오
+	 */
 	@Transactional
 	public TokenResponse sighIn(LoginRequest request) {
 
@@ -48,6 +55,15 @@ public class AuthService {
 		return jwtService.generateToken(UserAuth.from(user), new Date());
 	}
 
+	/**
+	 * 회원 로그인(소셜인증)<br>
+	 * 소셜 인증을 받은 유저의 액세스 토큰, 리프레시 토큰 발급<br>
+	 * 신규 로그인일 경우 자동 가입
+	 * @param oAuth UserInfo
+	 * @param registrationId 플랫폼
+	 * @return 액세스 토큰, 리프레시 토큰
+	 * @author 박경오
+	 */
 	@Transactional
 	@PreAuthorize("@auth.requiredSocial(authentication.getAuthorities())")
 	public TokenResponse socialSignIn(OAuth2User oAuth, String registrationId) {
