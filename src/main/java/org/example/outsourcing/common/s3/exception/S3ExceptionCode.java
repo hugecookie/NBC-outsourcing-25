@@ -11,7 +11,8 @@ public enum S3ExceptionCode implements ResponseCode {
 
 	NOT_SUPPORTED_FORMAT(false, HttpStatus.BAD_REQUEST, "지원하지 않는 파일 형식입니다. (jpg, jpeg, png 만 허용)"),
 	FILE_TOO_LARGE(false, HttpStatus.BAD_REQUEST, "파일 용량이 너무 큽니다. (최대 10MB 허용)"),
-	UPLOAD_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR, "S3 업로드 실패");
+	UPLOAD_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR, "S3 업로드 실패"),
+	FAILED_TO_GENERATE_SIGNED_URL(false, HttpStatus.INTERNAL_SERVER_ERROR, "Signed URL 생성에 실패했습니다.");
 
 	private final boolean success;
 	private final HttpStatus status;
