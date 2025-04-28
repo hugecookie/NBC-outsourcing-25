@@ -8,9 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.UUID;
 
 @Service
@@ -18,6 +23,7 @@ import java.util.UUID;
 public class S3Service {
 
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -43,10 +49,6 @@ public class S3Service {
         }
     }
 
-    public String getFileUrl(String key) {
-        return "https://" + bucket + ".s3.amazonaws.com/" + key;
-    }
-
     private void validateFile(MultipartFile file) {
         String filename = file.getOriginalFilename();
 
@@ -58,4 +60,31 @@ public class S3Service {
             throw new S3Exception(S3ExceptionCode.FILE_TOO_LARGE);
         }
     }
+
+    public String generateSignedUrl(String key) {
+        if (key == null || key.startsWith("http")) {
+            // 이미 완성된 URL이거나 null이면 그대로 반환
+            return key;
+        }
+
+        try {
+
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .build();
+
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                    .getObjectRequest(getObjectRequest)
+                    .signatureDuration(Duration.ofMinutes(10))
+                    .build();
+
+            return s3Presigner.presignGetObject(presignRequest)
+                    .url()
+                    .toString();
+        } catch (Exception e) {
+            throw new S3Exception(S3ExceptionCode.FAILED_TO_GENERATE_SIGNED_URL);
+        }
+    }
+
 }

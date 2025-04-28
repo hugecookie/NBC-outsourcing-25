@@ -90,10 +90,12 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public UserResponse viewUser(UserAuth userAuth) {
-		return UserResponse.from(
-			userRepository.findById(userAuth.getId())
-				.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND))
-		);
+		User user = userRepository.findById(userAuth.getId())
+				.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND));
+
+		String signedUrl = s3Service.generateSignedUrl(user.getProfileImgUrl());
+
+		return UserResponse.from(user, signedUrl);
 	}
 
 	@Transactional
@@ -107,9 +109,8 @@ public class UserService {
 			.orElseThrow(() -> new UserException(UserExceptionCode.USER_NOT_FOUND));
 
 		String key = s3Service.uploadFile(image);
-		String imageUrl = s3Service.getFileUrl(key);
+		user.changeProfileImage(key);
 
-		user.changeProfileImage(imageUrl);
 		userRepository.save(user);
 	}
 

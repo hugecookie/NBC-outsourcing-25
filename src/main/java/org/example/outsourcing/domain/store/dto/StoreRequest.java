@@ -4,8 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.outsourcing.domain.store.entity.Store;
 import org.example.outsourcing.domain.store.entity.StoreStatus;
 import org.example.outsourcing.domain.user.entity.User;
@@ -14,7 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalTime;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 @Schema(description = "가게 등록 요청 DTO")
 public class StoreRequest {
 
