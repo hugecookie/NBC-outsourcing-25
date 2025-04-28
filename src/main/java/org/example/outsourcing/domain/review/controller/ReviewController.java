@@ -1,15 +1,14 @@
 package org.example.outsourcing.domain.review.controller;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.outsourcing.common.annotation.ResponseMessage;
+import org.example.outsourcing.domain.auth.dto.UserAuth;
 import org.example.outsourcing.domain.review.dto.request.ReviewRequestDto;
 import org.example.outsourcing.domain.review.dto.response.ReviewResponseDto;
 import org.example.outsourcing.domain.review.service.ReviewService;
-import org.example.outsourcing.domain.user.entity.User;
-import org.example.outsourcing.domain.user.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,14 +18,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReviewController {
     private final ReviewService reviewService;
-    private final UserRepository userRepository;
 
     @PostMapping
     @ResponseMessage("리뷰가 성공적으로 작성되었습니다.")
-    public ReviewRequestDto createReview(@Valid @RequestBody ReviewRequestDto reviewRequestDto) {
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new EntityNotFoundException("테스트 유저 없음"));
-        reviewService.createReview(user.getId(), reviewRequestDto);
+    public ReviewRequestDto createReview(@AuthenticationPrincipal UserAuth userAuth, @Valid @RequestBody ReviewRequestDto reviewRequestDto) {
+        reviewService.createReview(userAuth, reviewRequestDto);
         return reviewRequestDto;
     }
 
