@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AuthExceptionCode implements ResponseCode {
 
-	SOCIAL_LOGIN_REQUIRED(false, HttpStatus.FORBIDDEN, "먼저 소셜 로그인 인증부터 진행해야합니다.");
+	SOCIAL_LOGIN_REQUIRED(false, HttpStatus.FORBIDDEN, "먼저 소셜 로그인 인증부터 진행해야합니다."),
+	UNSUPPORTED_OAUTH_PROVIDER(false, HttpStatus.BAD_REQUEST, "지원하지 않는 인가 서버입니다."),
+	UNSUPPORTED_LOCAL_AUTH_PROVIDER(false, HttpStatus.BAD_REQUEST, "로컬 서버는 소셜 로그인을 지원하지 않습니다.");
 
 	private final boolean isSuccess;
 	private final HttpStatus status;

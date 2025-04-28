@@ -48,8 +48,8 @@ public class SwaggerConfig {
 				)
 			)
 			.externalDocs(new ExternalDocumentation()
-				.description("Google Sign-in 바로가기")
-				.url("http://localhost:8080/api/auth/oauth2/signin/google")
+				.description("▶ Kakao OAuth2 로그인")
+				.url("http://localhost:8080/api/auth/oauth2/signin/kakao")
 			);
 	}
 }
