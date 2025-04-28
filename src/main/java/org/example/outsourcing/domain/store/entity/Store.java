@@ -66,4 +66,9 @@ public class Store extends BaseEntity {
     public void updateStoreImgUrl(String url) {
         this.storeImgUrl = url;
     }
+
+    public boolean isOwner(Long userId) {
+     return this.getOwner().getId().equals(userId);
+    }
+
 }

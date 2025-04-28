@@ -45,7 +45,7 @@ public class OrderApiLoggerAspect {
                         orderId = (Long) arg;
                     }
                 }
-                log.info("[ORDER LOG] 요청 시각: {}, 가게 ID: {}, 주문 ID: {}", requestTime, storeId, orderId);
+                log.info("[ORDER LOG] 요청 시각: {}, 주문 ID: {}", requestTime, orderId);
                 return null;
             }
 

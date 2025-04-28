@@ -48,4 +48,8 @@ public class Menu extends BaseEntity {
     public void deleteMenu(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
+
+    public boolean isOwner(Long userId) {
+        return this.store.getOwner().getId().equals(userId);
+    }
 }

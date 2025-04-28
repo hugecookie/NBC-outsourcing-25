@@ -93,7 +93,7 @@ public class CartService {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new CartException(CartExceptionCode.CART_ITEM_NOT_FOUND));
 
-        if (!cart.getUser().getId().equals(userId)) {
+        if (!cart.isCustomer(userId)) {
             throw new CartException(CartExceptionCode.ONLY_CART_OWNER_CAN_MODIFY);
         }
 
@@ -114,7 +114,7 @@ public class CartService {
             throw new CartException(CartExceptionCode.CART_EMPTY);
         }
 
-        if (!carts.get(0).getUser().getId().equals(userId)) {
+        if (!carts.get(0).isCustomer(userId)) {
             throw new CartException(CartExceptionCode.ONLY_CART_OWNER_CAN_MODIFY);
         }
 
@@ -127,7 +127,7 @@ public class CartService {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new CartException(CartExceptionCode.CART_ITEM_NOT_FOUND));
 
-        if (!cart.getUser().getId().equals(userId)) {
+        if (!cart.isCustomer(userId)) {
             throw new CartException(CartExceptionCode.ONLY_CART_OWNER_CAN_MODIFY);
         }
 
