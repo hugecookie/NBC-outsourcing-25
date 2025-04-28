@@ -30,13 +30,13 @@ public record UserResponse(
 	String profileImgUrl
 
 ) {
-	public static UserResponse from(User user) {
+	public static UserResponse from(User user, String signedUrl) {
 		return UserResponse.builder()
 			.email(user.getEmail())
 			.createdAt(user.getCreatedAt())
 			.name(user.getName())
 			.platform(user.getPlatform())
-			.profileImgUrl(user.getProfileImgUrl())
+			.profileImgUrl(signedUrl)
 			.build();
 	}
 }
