@@ -19,10 +19,10 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
-    // 알림 목록 조회 (사용자별로 알림 조회)
+    // 알림 목록 조회 (사용자별)
     @Transactional(readOnly = true)
     public List<NotificationResponseDto> getNotifications(Long userId) {
-        List<Notification> notifications = notificationRepository.findByUserId(userId);  // 사용자에 해당하는 알림 조회
+        List<Notification> notifications = notificationRepository.findByUserId(userId);
         return notifications.stream()
                 .map(notification -> new NotificationResponseDto(
                         notification.getId(),
@@ -32,12 +32,17 @@ public class NotificationService {
                 .collect(Collectors.toList());
     }
 
-    // 알림 읽음 처리 (알림을 읽은 상태로 업데이트)
+    // 알림 읽음 처리 (본인 알림만 읽을 수 있도록 userId 검증 추가)
     @Transactional
-    public void markAsRead(NotificationRequestDto requestDto) {
+    public void markAsRead(Long userId, NotificationRequestDto requestDto) {
         Notification notification = notificationRepository.findById(requestDto.notificationId())
                 .orElseThrow(() -> new NotificationException(NotificationExceptionCode.NOT_FOUND_NOTIFICATION));
+
+        // userId 검증 추가
+        if (!notification.getUser().getId().equals(userId)) {
+            throw new NotificationException(NotificationExceptionCode.NO_AUTH_FOR_NOTIFICATION);
+        }
+
         notification.markAsRead();
     }
-
 }
