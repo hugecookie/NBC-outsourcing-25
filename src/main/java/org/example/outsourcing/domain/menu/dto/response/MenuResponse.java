@@ -26,13 +26,13 @@ public record MenuResponse (
         String menuImgUrl
 
 ){
-    public static MenuResponse from(Menu menu) {
+    public static MenuResponse from(Menu menu, String signedUrl) {
         return MenuResponse.builder()
                 .id(menu.getId())
                 .name(menu.getName())
                 .price(menu.getPrice())
                 .description(menu.getDescription())
-                .menuImgUrl(menu.getMenuImgUrl())
+                .menuImgUrl(signedUrl)
                 .build();
     }
 }

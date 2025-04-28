@@ -53,15 +53,14 @@ public class StoreService {
             throw new StoreException(StoreExceptionCode.STORE_LIMIT_EXCEEDED);
         }
 
-        String imageUrl = null;
+        String key = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
-            String key = s3Service.uploadFile(request.getImage());
-            imageUrl = s3Service.getFileUrl(key);
+            key = s3Service.uploadFile(request.getImage());
         } else {
-            imageUrl = "https://hugecookie-out-sourcing.s3.ap-northeast-2.amazonaws.com/%E1%84%83%E1%85%A1%E1%84%8B%E1%85%AE%E1%86%AB%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3.jpeg";
+            key = "https://hugecookie-out-sourcing.s3.ap-northeast-2.amazonaws.com/%E1%84%83%E1%85%A1%E1%84%8B%E1%85%AE%E1%86%AB%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3.jpeg";
         }
 
-        Store store = request.toEntity(user, imageUrl);
+        Store store = request.toEntity(user, key);
         storeRepository.save(store);
 
         return StoreResponse.from(store);
@@ -79,8 +78,11 @@ public class StoreService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreException(StoreExceptionCode.STORE_NOT_FOUND));
 
+        String signedUrl = s3Service.generateSignedUrl(store.getStoreImgUrl());
+
         List<MenuResponse> menus = menuService.getMenusByStoreId(storeId);
-        return StoreDetailResponse.from(store, menus);
+
+        return StoreDetailResponse.from(store, signedUrl, menus);
     }
 
     /**
@@ -112,9 +114,8 @@ public class StoreService {
         Store store = getOwnedStore(storeId, userAuth);
 
         String key = s3Service.uploadFile(image);
-        String url = s3Service.getFileUrl(key);
 
-        store.updateStoreImgUrl(url);
+        store.updateStoreImgUrl(key);
         return StoreResponse.from(store);
     }
 

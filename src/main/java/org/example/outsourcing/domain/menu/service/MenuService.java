@@ -51,7 +51,7 @@ public class MenuService {
                         .build()
         );
 
-        return MenuResponse.from(menu);
+        return MenuResponse.from(menu, s3Service.generateSignedUrl(menu.getMenuImgUrl()));
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +62,10 @@ public class MenuService {
 
         return menuRepository.findAllByStoreAndIsDeletedFalse(store)
                 .stream()
-                .map(MenuResponse::from)
+                .map(menu -> {
+                    String signedUrl = s3Service.generateSignedUrl(menu.getMenuImgUrl());
+                    return MenuResponse.from(menu, signedUrl);
+                })
                 .toList();
     }
 
@@ -78,7 +81,7 @@ public class MenuService {
 
         menu.updateMenu(request.name(), request.price(), request.description(), request.menuImgUrl());
 
-        return MenuResponse.from(menu);
+        return MenuResponse.from(menu, s3Service.generateSignedUrl(menu.getMenuImgUrl()));
     }
 
     @Transactional
@@ -103,17 +106,16 @@ public class MenuService {
                 .orElseThrow(() -> new MenuException(MenuExceptionCode.MENU_NOT_FOUND));
 
         if (!menu.getStore().getOwner().getId().equals(userAuth.getId())) {
-            throw new MenuException(MenuExceptionCode.MENU_FORBIDDEN);
+            throw new MenuException(MenuExceptionCode.ONLY_STORE_OWNER_CAN_MODIFY);
         }
 
         String key = s3Service.uploadFile(image);
-        String url = s3Service.getFileUrl(key);
 
-        menu.updateMenu(null, null, null, url);
+        menu.updateMenu(null, null, null, key);
 
         menuRepository.save(menu);
 
-        return MenuResponse.from(menu);
+        return MenuResponse.from(menu, s3Service.generateSignedUrl(menu.getMenuImgUrl()));
     }
 
 }

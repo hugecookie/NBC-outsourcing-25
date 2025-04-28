@@ -11,15 +11,17 @@ public record StoreDetailResponse(
         String category,
         String address,
         String phone,
+        String storeImgUrl,
         List<MenuResponse> menus
 ) {
-    public static StoreDetailResponse from(Store store, List<MenuResponse> menus) {
+    public static StoreDetailResponse from(Store store, String signedUrl, List<MenuResponse> menus) {
         return new StoreDetailResponse(
                 store.getId(),
                 store.getName(),
                 store.getCategory(),
                 store.getAddress(),
                 store.getPhone(),
+                signedUrl,
                 menus
         );
     }
